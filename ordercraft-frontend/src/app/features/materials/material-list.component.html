@@ -1,0 +1,203 @@
+<app-navbar></app-navbar>
+
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-titles">
+      <div class="breadcrumb">Manufacturing / Inventory & Warehouse</div>
+      <h2>Raw Materials Inventory</h2>
+      <p>Manage manufacturing stock levels, supplier linkages, safety buffers, and inventory valuations</p>
+    </div>
+    <div class="header-actions">
+      <button class="oc-btn-primary" (click)="openCreateModal()">
+        <mat-icon>add</mat-icon>
+        <span>Add Raw Material</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards-row">
+    <div class="oc-mini-card">
+      <span class="mini-label">Total Material SKUs</span>
+      <span class="mini-val">{{ materials.length }}</span>
+    </div>
+    <div class="oc-mini-card">
+      <span class="mini-label">Total Inventory Valuation</span>
+      <span class="mini-val mono text-primary">₹{{ getTotalInventoryValuation() | number:'1.2-2' }}</span>
+    </div>
+    <div class="oc-mini-card alert" (click)="setStockFilter('LOW')">
+      <span class="mini-label">Shortage / Low Stock Alerts</span>
+      <span class="mini-val text-danger">{{ getLowStockCount() }}</span>
+    </div>
+  </div>
+
+  <!-- Filter & Search Bar -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search materials by code, name, or supplier..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilter()"
+      />
+    </div>
+
+    <div class="status-tabs">
+      <button [class.active]="stockFilter === 'ALL'" (click)="setStockFilter('ALL')">All Materials</button>
+      <button [class.active]="stockFilter === 'LOW'" (click)="setStockFilter('LOW')">Low Stock Alert (&lt;50)</button>
+      <button [class.active]="stockFilter === 'NORMAL'" (click)="setStockFilter('NORMAL')">Adequate Stock</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  @if (isLoading) {
+    <div class="state-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading raw material inventory...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="state-container error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button class="oc-btn-secondary" (click)="fetchMaterials()">Retry Connection</button>
+    </div>
+  } @else {
+    <div class="oc-table-container">
+      <table class="oc-table">
+        <thead>
+          <tr>
+            <th>Material Code</th>
+            <th>Name & Specification</th>
+            <th>Stock Level</th>
+            <th>Unit Cost</th>
+            <th>Inventory Value</th>
+            <th>Assigned Supplier</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (mat of filteredMaterials; track mat.id) {
+            <tr>
+              <td class="mono font-bold">{{ mat.code }}</td>
+              <td>
+                <strong>{{ mat.name }}</strong>
+              </td>
+              <td>
+                <div class="stock-level-cell">
+                  <span class="mono font-bold">{{ mat.stockQty }} {{ mat.unit }}</span>
+                  @if (mat.stockQty < 50) {
+                    <span class="badge-alert">Low Stock</span>
+                  } @else {
+                    <span class="badge-ok">In Stock</span>
+                  }
+                </div>
+              </td>
+              <td class="mono">₹{{ mat.unitCost | number:'1.2-2' }} / {{ mat.unit }}</td>
+              <td class="mono font-bold text-primary">₹{{ (mat.stockQty * mat.unitCost) | number:'1.2-2' }}</td>
+              <td>
+                <span class="supplier-tag">{{ mat.supplier?.name || 'Unassigned' }}</span>
+              </td>
+              <td class="text-right">
+                <div class="action-buttons">
+                  <button class="btn-action-icon" (click)="openEditModal(mat)" matTooltip="Edit Material">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button class="btn-action-icon delete" (click)="deleteMaterial(mat.id!)" matTooltip="Delete Material">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (filteredMaterials.length === 0) {
+        <div class="empty-state">
+          <mat-icon>layers_clear</mat-icon>
+          <h3>No materials found</h3>
+          <p>Add raw materials or adjust search filters to inspect stock.</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- MATERIAL CREATE/EDIT DIALOG -->
+  @if (isModalOpen) {
+    <div class="dialog-backdrop" (click)="closeModal()">
+      <div class="dialog-box" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <div class="dialog-title-group">
+            <mat-icon class="title-icon">layers</mat-icon>
+            <div>
+              <h3>{{ editingMaterial ? 'Edit Material Item' : 'Add Raw Material' }}</h3>
+              <p>Configure warehouse inventory item specifications</p>
+            </div>
+          </div>
+          <button class="close-icon-btn" (click)="closeModal()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <form [formGroup]="materialForm" (ngSubmit)="saveMaterial()">
+          <div class="dialog-body">
+            <div class="form-group">
+              <label>Material Code <span class="required">*</span></label>
+              <input type="text" formControlName="code" class="form-input mono" placeholder="e.g. MAT-COP-AWG24" />
+            </div>
+
+            <div class="form-group">
+              <label>Material Name & Description <span class="required">*</span></label>
+              <input type="text" formControlName="name" class="form-input" placeholder="e.g. Enameled Copper Wire 24 AWG" />
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Unit of Measure <span class="required">*</span></label>
+                <select formControlName="unit" class="form-select">
+                  <option value="kg">kg (Kilograms)</option>
+                  <option value="pcs">pcs (Pieces)</option>
+                  <option value="meters">meters (Length)</option>
+                  <option value="liters">liters (Volume)</option>
+                  <option value="rolls">rolls</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Unit Cost (₹) <span class="required">*</span></label>
+                <input type="number" step="0.5" min="0" formControlName="unitCost" class="form-input mono" placeholder="0.00" />
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label>Current Stock Quantity <span class="required">*</span></label>
+                <input type="number" step="1" min="0" formControlName="stockQty" class="form-input mono" placeholder="0" />
+              </div>
+
+              <div class="form-group">
+                <label>Primary Supplier</label>
+                <select formControlName="supplierId" class="form-select">
+                  <option [ngValue]="null">Select supplier...</option>
+                  @for (s of suppliers; track s.id) {
+                    <option [ngValue]="s.id">{{ s.name }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="dialog-footer">
+            <button type="button" class="oc-btn-secondary" (click)="closeModal()">Cancel</button>
+            <button type="submit" class="oc-btn-primary" [disabled]="materialForm.invalid">
+              <mat-icon>check</mat-icon>
+              <span>{{ editingMaterial ? 'Save Changes' : 'Add Material' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

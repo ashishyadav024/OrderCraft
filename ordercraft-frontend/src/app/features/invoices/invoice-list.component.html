@@ -1,0 +1,401 @@
+<app-navbar></app-navbar>
+
+<div class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-titles">
+      <div class="breadcrumb">Manufacturing / Accounts & Finance</div>
+      <h2>Invoicing & Payment Settlement</h2>
+      <p>Issue tax invoices for completed production orders, track payment collections, and reconcile accounts receivable</p>
+    </div>
+  </div>
+
+  <!-- Filter & Search Bar -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search invoices by invoice #, order #, or customer..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilter()"
+      />
+    </div>
+
+    <div class="status-tabs">
+      <button [class.active]="statusFilter === 'ALL'" (click)="setStatusFilter('ALL')">All</button>
+      <button [class.active]="statusFilter === 'UNPAID'" (click)="setStatusFilter('UNPAID')">Unpaid</button>
+      <button [class.active]="statusFilter === 'PARTIAL'" (click)="setStatusFilter('PARTIAL')">Partial</button>
+      <button [class.active]="statusFilter === 'PAID'" (click)="setStatusFilter('PAID')">Paid</button>
+    </div>
+  </div>
+
+  <!-- Table State -->
+  @if (isLoading) {
+    <div class="state-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading invoice ledgers...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="state-container error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button class="oc-btn-secondary" (click)="fetchInvoices()">Retry Connection</button>
+    </div>
+  } @else {
+    <div class="oc-table-container">
+      <table class="oc-table">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Customer</th>
+            <th>Sales Order</th>
+            <th>Status</th>
+            <th>Total Invoiced</th>
+            <th>Outstanding Balance</th>
+            <th>Due Date</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (inv of filteredInvoices; track inv.id) {
+            <tr class="inv-row" (click)="openInvoiceDetails(inv)">
+              <td class="mono font-bold text-primary">{{ inv.invoiceNo }}</td>
+              <td>
+                <strong>{{ inv.salesOrder?.customer?.name || 'Customer Account' }}</strong>
+              </td>
+              <td>
+                <span class="linked-order-tag">
+                  <mat-icon>assignment</mat-icon>
+                  <span>{{ inv.salesOrder?.orderNo || 'SO-N/A' }}</span>
+                </span>
+              </td>
+              <td>
+                <span class="status-chip" [attr.data-status]="inv.status">
+                  {{ inv.status }}
+                </span>
+              </td>
+              <td class="mono font-bold">₹{{ inv.totalAmount | number:'1.2-2' }}</td>
+              <td>
+                <div class="balance-cell">
+                  <span class="mono font-bold" [class.text-danger]="getRemainingBalance(inv) > 0">
+                    ₹{{ getRemainingBalance(inv) | number:'1.2-2' }}
+                  </span>
+                  <!-- Mini Progress Bar -->
+                  <div class="mini-progress-track">
+                    <div class="mini-progress-bar" [style.width.%]="getPaidPercentage(inv)"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-muted">{{ inv.dueDate | date:'mediumDate' }}</td>
+              <td class="text-right" (click)="$event.stopPropagation()">
+                <div class="action-buttons">
+                  <button class="btn-action-icon" (click)="openInvoiceDetails(inv)" matTooltip="View Tax Invoice">
+                    <mat-icon>receipt</mat-icon>
+                  </button>
+                  @if (inv.status !== 'PAID') {
+                    <button
+                      class="btn-pay-action"
+                      (click)="openPaymentModal(inv)"
+                      matTooltip="Record Payment Transaction"
+                    >
+                      <mat-icon>payments</mat-icon>
+                      <span>Collect Payment</span>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (filteredInvoices.length === 0) {
+        <div class="empty-state">
+          <mat-icon>receipt_long</mat-icon>
+          <h3>No invoices recorded</h3>
+          <p>Generate invoices from Confirmed Sales Orders to bill manufacturing clients.</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- TAX INVOICE PRINTABLE / VIEW DRAWER -->
+  @if (selectedInvoice) {
+    <div class="drawer-overlay" (click)="closeInvoiceDetails()">
+      <div class="drawer-panel large" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="drawer-header">
+          <div class="drawer-title-row">
+            <span class="status-chip" [attr.data-status]="selectedInvoice.status">{{ selectedInvoice.status }}</span>
+            <h3>Tax Invoice: {{ selectedInvoice.invoiceNo }}</h3>
+          </div>
+          <div class="drawer-actions">
+            <button class="btn-print" (click)="printInvoice()">
+              <mat-icon>print</mat-icon>
+              <span>Print Invoice</span>
+            </button>
+            <button class="close-icon-btn" (click)="closeInvoiceDetails()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="drawer-body invoice-printable-body">
+          <!-- Corporate Letterhead -->
+          <div class="invoice-letterhead">
+            <div class="company-brand">
+              <div class="brand-symbol">
+                <mat-icon>precision_manufacturing</mat-icon>
+              </div>
+              <div>
+                <h2>OrderCraft Manufacturing Industries Ltd.</h2>
+                <p>Industrial Tech City, Sector 4, Pune 411057, Maharashtra</p>
+                <p class="mono text-muted">GSTIN: 27AABCO1234F1ZP | CIN: U29100MH2026PLC091234</p>
+              </div>
+            </div>
+            <div class="invoice-tax-tag">
+              TAX INVOICE
+            </div>
+          </div>
+
+          <!-- Metadata Section -->
+          <div class="invoice-meta-grid">
+            <div class="meta-block">
+              <span class="meta-label">Billed To (Client):</span>
+              <strong class="client-name">{{ selectedInvoice.salesOrder?.customer?.name || 'Customer' }}</strong>
+              <p>{{ selectedInvoice.salesOrder?.customer?.address || 'Industrial Premises' }}</p>
+              <p>Email: {{ selectedInvoice.salesOrder?.customer?.email || 'N/A' }}</p>
+              <p>Phone: {{ selectedInvoice.salesOrder?.customer?.phone || 'N/A' }}</p>
+            </div>
+            <div class="meta-block text-right">
+              <div class="meta-pair">
+                <span class="meta-label">Invoice Number:</span>
+                <span class="mono font-bold">{{ selectedInvoice.invoiceNo }}</span>
+              </div>
+              <div class="meta-pair">
+                <span class="meta-label">Sales Order Reference:</span>
+                <span class="mono font-bold">{{ selectedInvoice.salesOrder?.orderNo }}</span>
+              </div>
+              <div class="meta-pair">
+                <span class="meta-label">Date of Issue:</span>
+                <span>{{ selectedInvoice.invoiceDate | date:'fullDate' }}</span>
+              </div>
+              <div class="meta-pair">
+                <span class="meta-label">Payment Due Date:</span>
+                <span class="font-bold text-danger">{{ selectedInvoice.dueDate | date:'fullDate' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Line Items Table -->
+          <div class="invoice-table-section">
+            <table class="oc-table invoice-items-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product Description</th>
+                  <th class="text-right">Qty</th>
+                  <th class="text-right">Unit Price</th>
+                  <th class="text-right">Total (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of selectedInvoice.salesOrder?.items; track item.id; let idx = $index) {
+                  <tr>
+                    <td>{{ idx + 1 }}</td>
+                    <td>
+                      <strong>{{ item.product?.name || 'Manufactured Item' }}</strong>
+                      <span class="sub mono">{{ item.product?.sku }}</span>
+                    </td>
+                    <td class="text-right mono font-semibold">{{ item.quantity }} units</td>
+                    <td class="text-right mono">₹{{ item.unitPrice | number:'1.2-2' }}</td>
+                    <td class="text-right mono font-bold">₹{{ item.lineTotal || (item.quantity * item.unitPrice) | number:'1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Totals Breakdown -->
+          <div class="invoice-totals-section">
+            <div class="totals-box">
+              <div class="tot-row">
+                <span>Subtotal (Net Amount):</span>
+                <span class="mono">₹{{ selectedInvoice.subtotal | number:'1.2-2' }}</span>
+              </div>
+              <div class="tot-row">
+                <span>Integrated GST (18.0%):</span>
+                <span class="mono">₹{{ selectedInvoice.taxAmount | number:'1.2-2' }}</span>
+              </div>
+              <div class="tot-row grand-total">
+                <strong>Grand Total (Inclusive of Taxes):</strong>
+                <strong class="mono text-primary">₹{{ selectedInvoice.totalAmount | number:'1.2-2' }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settlement Progress & Payment Ledger -->
+          <div class="payment-ledger-section">
+            <div class="ledger-header">
+              <h4>
+                <mat-icon>account_balance_wallet</mat-icon>
+                <span>Payment Settlement Ledger</span>
+              </h4>
+              <div class="ledger-balance-pill">
+                <span>Outstanding:</span>
+                <strong class="mono" [class.text-danger]="getRemainingBalance(selectedInvoice) > 0">
+                  ₹{{ getRemainingBalance(selectedInvoice) | number:'1.2-2' }}
+                </strong>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="settlement-progress-wrap">
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" [style.width.%]="getPaidPercentage(selectedInvoice)"></div>
+              </div>
+              <div class="progress-legend">
+                <span>Paid: ₹{{ getTotalPaid(selectedInvoice) | number:'1.2-2' }} ({{ getPaidPercentage(selectedInvoice) }}%)</span>
+                <span>Due: ₹{{ getRemainingBalance(selectedInvoice) | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <!-- Ledger Table -->
+            <table class="oc-table compact">
+              <thead>
+                <tr>
+                  <th>Payment Date</th>
+                  <th>Payment Method</th>
+                  <th>Reference / Txn #</th>
+                  <th class="text-right">Amount Credited</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (pay of selectedInvoice.payments; track pay.id) {
+                  <tr>
+                    <td>{{ pay.paymentDate | date:'mediumDate' }}</td>
+                    <td>
+                      <span class="method-tag">{{ pay.method }}</span>
+                    </td>
+                    <td class="mono font-semibold">{{ pay.referenceNo || 'Direct Deposit' }}</td>
+                    <td class="mono font-bold text-success text-right">+₹{{ pay.amount | number:'1.2-2' }}</td>
+                  </tr>
+                }
+                @if (!selectedInvoice.payments || selectedInvoice.payments.length === 0) {
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">No payments recorded against this invoice yet.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="drawer-footer">
+          <button class="oc-btn-secondary" (click)="closeInvoiceDetails()">Close</button>
+          @if (selectedInvoice.status !== 'PAID') {
+            <button class="oc-btn-primary" (click)="openPaymentModal(selectedInvoice)">
+              <mat-icon>payments</mat-icon>
+              <span>Record Payment</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- RECORD PAYMENT MODAL DIALOG -->
+  @if (isPaymentModalOpen && paymentInvoice) {
+    <div class="dialog-backdrop" (click)="closePaymentModal()">
+      <div class="dialog-box" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <div class="dialog-title-group">
+            <mat-icon class="title-icon">payments</mat-icon>
+            <div>
+              <h3>Record Customer Payment</h3>
+              <p>Post collection against Invoice {{ paymentInvoice.invoiceNo }}</p>
+            </div>
+          </div>
+          <button class="close-icon-btn" (click)="closePaymentModal()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <form [formGroup]="paymentForm" (ngSubmit)="submitPayment()">
+          <div class="dialog-body">
+            @if (paymentSuccess) {
+              <div class="po-feedback-banner">
+                <mat-icon>check_circle</mat-icon>
+                <span>{{ paymentSuccess }}</span>
+              </div>
+            }
+
+            @if (paymentError) {
+              <div class="error-banner">
+                <mat-icon>warning</mat-icon>
+                <span>{{ paymentError }}</span>
+              </div>
+            }
+
+            <div class="balance-banner">
+              <div class="banner-item">
+                <span class="b-label">Total Invoiced</span>
+                <span class="b-val mono">₹{{ paymentInvoice.totalAmount | number:'1.2-2' }}</span>
+              </div>
+              <div class="banner-item">
+                <span class="b-label">Current Balance Due</span>
+                <span class="b-val mono text-danger">₹{{ getRemainingBalance(paymentInvoice) | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="label-with-action">
+                <label>Payment Amount (₹) <span class="required">*</span></label>
+                <button type="button" class="btn-fill-full" (click)="fillFullBalance()">
+                  Pay Full Balance
+                </button>
+              </div>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                formControlName="amount"
+                class="form-input mono"
+                placeholder="0.00"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Payment Method <span class="required">*</span></label>
+              <select formControlName="method" class="form-select">
+                <option value="BANK_TRANSFER">Bank Wire Transfer (NEFT/RTGS/IMPS)</option>
+                <option value="UPI">UPI Digital Payment</option>
+                <option value="CARD">Credit / Debit Card</option>
+                <option value="CASH">Cash Deposit</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Transaction / UTR Reference # <span class="required">*</span></label>
+              <input
+                type="text"
+                formControlName="referenceNo"
+                class="form-input mono"
+                placeholder="e.g. UTR-AXIS-992104"
+              />
+            </div>
+          </div>
+
+          <div class="dialog-footer">
+            <button type="button" class="oc-btn-secondary" (click)="closePaymentModal()">Cancel</button>
+            <button type="submit" class="oc-btn-primary" [disabled]="paymentForm.invalid">
+              <mat-icon>check</mat-icon>
+              <span>Confirm & Credit Ledger</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

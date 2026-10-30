@@ -1,0 +1,119 @@
+<header class="app-header">
+  <div class="header-inner">
+    <!-- Brand -->
+    <a routerLink="/dashboard" class="brand-link">
+      <div class="brand-icon">
+        <mat-icon>precision_manufacturing</mat-icon>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">OrderCraft</span>
+        <span class="brand-subtitle">Manufacturing OMS</span>
+      </div>
+    </a>
+
+    <!-- Primary Nav Links -->
+    <nav class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+
+      <a routerLink="/orders" routerLinkActive="active" class="nav-item">
+        <mat-icon>assignment</mat-icon>
+        <span>Sales Orders</span>
+      </a>
+
+      <a routerLink="/products" routerLinkActive="active" class="nav-item">
+        <mat-icon>inventory_2</mat-icon>
+        <span>Products & BOM</span>
+      </a>
+
+      <a routerLink="/materials" routerLinkActive="active" class="nav-item">
+        <mat-icon>layers</mat-icon>
+        <span>Materials</span>
+      </a>
+
+      <a routerLink="/purchase-orders" routerLinkActive="active" class="nav-item">
+        <mat-icon>local_shipping</mat-icon>
+        <span>Procurement</span>
+      </a>
+
+      <a routerLink="/invoices" routerLinkActive="active" class="nav-item">
+        <mat-icon>receipt_long</mat-icon>
+        <span>Invoices & Payments</span>
+      </a>
+
+      <div class="nav-dropdown-wrapper">
+        <button mat-button [matMenuTriggerFor]="masterMenu" class="nav-item more-btn">
+          <mat-icon>category</mat-icon>
+          <span>Directories</span>
+          <mat-icon class="caret">arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #masterMenu="matMenu">
+          <a mat-menu-item routerLink="/customers">
+            <mat-icon>people</mat-icon>
+            <span>Customers</span>
+          </a>
+          <a mat-menu-item routerLink="/suppliers">
+            <mat-icon>business</mat-icon>
+            <span>Suppliers</span>
+          </a>
+          @if (canAccess(['ADMIN'])) {
+            <a mat-menu-item routerLink="/users">
+              <mat-icon>admin_panel_settings</mat-icon>
+              <span>User Administration</span>
+            </a>
+          }
+        </mat-menu>
+      </div>
+    </nav>
+
+    <!-- Right Utility Section -->
+    <div class="header-right" *ngIf="user$ | async as user">
+      <!-- Role Switcher for seamless testing -->
+      <button
+        mat-button
+        [matMenuTriggerFor]="roleMenu"
+        class="role-switch-btn"
+        matTooltip="Switch Role for Testing Access Control"
+      >
+        <span class="role-pill" [ngClass]="user.role">{{ user.role }}</span>
+        <mat-icon class="switch-icon">swap_horiz</mat-icon>
+      </button>
+
+      <mat-menu #roleMenu="matMenu">
+        <div class="menu-header">Switch Role Profile:</div>
+        @for (r of availableRoles; track r) {
+          <button mat-menu-item (click)="onSwitchRole(r)" [class.selected]="r === user.role">
+            <mat-icon>{{ r === 'ADMIN' ? 'shield' : r === 'SALES' ? 'storefront' : r === 'PURCHASE' ? 'shopping_cart' : 'account_balance' }}</mat-icon>
+            <span>{{ r }}</span>
+            @if (r === user.role) {
+              <mat-icon class="check-icon">check</mat-icon>
+            }
+          </button>
+        }
+      </mat-menu>
+
+      <!-- User Menu -->
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
+        <div class="avatar-circle">
+          {{ user.username.substring(0, 1).toUpperCase() }}
+        </div>
+        <span class="user-name">{{ user.username }}</span>
+        <mat-icon class="caret">arrow_drop_down</mat-icon>
+      </button>
+
+      <mat-menu #userMenu="matMenu">
+        <div class="user-dropdown-info">
+          <strong>{{ user.username }}</strong>
+          <span class="user-role-label">{{ user.role }}</span>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="onLogout()">
+          <mat-icon>logout</mat-icon>
+          <span>Sign Out</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+</header>

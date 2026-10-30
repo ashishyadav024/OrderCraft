@@ -1,0 +1,1 @@
+import{ln as oo,rt as Wn}from"./main-FN53AUXV.js";import{n as B}from"./chunk-6AaylNfv.js";var f=(()=>{class t{static ɵfac=function(n){return new(n||t)};static ɵmod=oo({type:t});static ɵinj=Wn({imports:[B]})}return t})();export{f as t};

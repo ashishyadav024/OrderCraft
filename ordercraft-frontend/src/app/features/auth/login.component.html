@@ -1,0 +1,178 @@
+<div class="login-page-container">
+  <!-- Left Hero Showcase Panel -->
+  <div class="hero-showcase">
+    <div class="hero-content">
+      <div class="brand-badge">
+        <mat-icon class="brand-icon">precision_manufacturing</mat-icon>
+        <div class="brand-title-wrap">
+          <span class="brand-name">OrderCraft</span>
+          <span class="brand-sub">Manufacturing Order Management System</span>
+        </div>
+      </div>
+
+      <div class="hero-headline-block">
+        <h1 class="hero-title">Automate your Order-to-Cash lifecycle.</h1>
+        <p class="hero-description">
+          A unified enterprise manufacturing suite unifying multi-tier Bill of Materials (BOM) explosion,
+          automated shortage procurement, real-time goods receipt inventory tracking, and corporate tax invoicing.
+        </p>
+      </div>
+
+      <div class="feature-pills-grid">
+        <div class="feature-card">
+          <div class="feature-icon-box blue">
+            <mat-icon>account_tree</mat-icon>
+          </div>
+          <div class="feature-text">
+            <h4>BOM Shortage Engine</h4>
+            <p>Calculates exact component shortfalls across assembly orders.</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box green">
+            <mat-icon>local_shipping</mat-icon>
+          </div>
+          <div class="feature-text">
+            <h4>1-Click Auto-Procurement</h4>
+            <p>Generates targeted purchase orders directly from stock shortfalls.</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box amber">
+            <mat-icon>inventory</mat-icon>
+          </div>
+          <div class="feature-text">
+            <h4>Real-Time Inventory Sync</h4>
+            <p>Goods receipt updates warehouse stock balances instantly.</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-box purple">
+            <mat-icon>receipt_long</mat-icon>
+          </div>
+          <div class="feature-text">
+            <h4>Corporate Tax Invoicing</h4>
+            <p>Full payment ledger reconciliation with balance tracking.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-footer-status">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span>Spring Boot 4.1.1 & Oracle / MySQL API Ready</span>
+        </div>
+        <span class="version-label">OrderCraft v1.0.0-PROD</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Authentication Form Panel -->
+  <div class="auth-form-wrapper">
+    <div class="form-container">
+      <div class="form-header">
+        <h2 class="form-title">Welcome to OrderCraft</h2>
+        <p class="form-subtitle">Sign in to manage manufacturing orders and supply chain</p>
+      </div>
+
+      <!-- Quick Demo Login Buttons -->
+      <div class="demo-login-box">
+        <div class="demo-title">
+          <mat-icon>bolt</mat-icon>
+          <span>1-Click Demo Profiles</span>
+        </div>
+        <div class="demo-buttons-grid">
+          @for (demo of demoRoles; track demo.role) {
+            <button
+              type="button"
+              class="demo-role-btn"
+              (click)="quickLogin(demo.user, demo.pass)"
+              [disabled]="isLoading"
+            >
+              <div class="demo-btn-icon" [style.color]="demo.color">
+                <mat-icon>{{ demo.icon }}</mat-icon>
+              </div>
+              <div class="demo-btn-text">
+                <span class="demo-btn-role">{{ demo.role }}</span>
+                <span class="demo-btn-label">{{ demo.label }}</span>
+              </div>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="divider-with-text">
+        <span>OR ENTER CREDENTIALS</span>
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-banner">
+          <mat-icon>warning</mat-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <div class="form-group">
+          <label class="input-label" for="username-input">Username</label>
+          <div class="input-field-wrap">
+            <mat-icon class="field-icon">person</mat-icon>
+            <input
+              id="username-input"
+              type="text"
+              formControlName="username"
+              placeholder="e.g. admin, sales, purchase, accounts"
+              class="custom-input"
+              autocomplete="username"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="input-label" for="password-input">Password</label>
+          <div class="input-field-wrap">
+            <mat-icon class="field-icon">lock</mat-icon>
+            <input
+              id="password-input"
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+              placeholder="Enter password"
+              class="custom-input"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="toggle-visibility-btn"
+              (click)="hidePassword = !hidePassword"
+              tabindex="-1"
+            >
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="submit-button"
+          [disabled]="loginForm.invalid || isLoading"
+        >
+          @if (isLoading) {
+            <mat-spinner diameter="20" class="spinner"></mat-spinner>
+            <span>Authenticating...</span>
+          } @else {
+            <mat-icon>login</mat-icon>
+            <span>Sign In to Manufacturing OMS</span>
+          }
+        </button>
+      </form>
+
+      <div class="security-notice">
+        <mat-icon>verified_user</mat-icon>
+        <span>Protected by Spring Security JWT & Role-Based Access Control</span>
+      </div>
+    </div>
+  </div>
+</div>

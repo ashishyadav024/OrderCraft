@@ -1,0 +1,420 @@
+<app-navbar></app-navbar>
+
+<div class="page-container">
+  <!-- Top Bar & Title -->
+  <div class="page-header">
+    <div class="header-titles">
+      <div class="breadcrumb">Manufacturing / Sales & Work Orders</div>
+      <h2>Sales Orders Management</h2>
+      <p>Oversee client production orders, explode bills-of-materials, and trigger automated procurement</p>
+    </div>
+    <div class="header-actions">
+      <button class="oc-btn-primary" (click)="openCreateModal()">
+        <mat-icon>add</mat-icon>
+        <span>New Sales Order</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search orders by number or customer name..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilter()"
+      />
+      @if (searchTerm) {
+        <button class="clear-btn" (click)="searchTerm = ''; applyFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+
+    <div class="status-tabs">
+      <button [class.active]="selectedStatusFilter === 'ALL'" (click)="setStatusFilter('ALL')">All</button>
+      <button [class.active]="selectedStatusFilter === 'CONFIRMED'" (click)="setStatusFilter('CONFIRMED')">Confirmed</button>
+      <button [class.active]="selectedStatusFilter === 'IN_PRODUCTION'" (click)="setStatusFilter('IN_PRODUCTION')">In Production</button>
+      <button [class.active]="selectedStatusFilter === 'INVOICED'" (click)="setStatusFilter('INVOICED')">Invoiced</button>
+      <button [class.active]="selectedStatusFilter === 'PAID'" (click)="setStatusFilter('PAID')">Paid</button>
+    </div>
+  </div>
+
+  <!-- Content State -->
+  @if (isLoading) {
+    <div class="state-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading manufacturing orders...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="state-container error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button class="oc-btn-secondary" (click)="fetchOrders()">Retry Connection</button>
+    </div>
+  } @else {
+    <!-- Main Orders Table -->
+    <div class="oc-table-container">
+      <table class="oc-table">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Items</th>
+            <th>Total Value</th>
+            <th>Order Date</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of filteredOrders; track order.id) {
+            <tr class="order-row" (click)="openOrderDetails(order)">
+              <td class="mono font-bold text-primary">{{ order.orderNo }}</td>
+              <td>
+                <div class="customer-cell">
+                  <strong>{{ order.customer?.name || order.customerName || 'N/A' }}</strong>
+                  <span class="sub-text">{{ order.customer?.address || 'Industrial Account' }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="status-chip" [attr.data-status]="order.status">
+                  {{ order.status }}
+                </span>
+              </td>
+              <td>
+                <span class="items-badge">{{ order.items?.length || 1 }} product line(s)</span>
+              </td>
+              <td class="mono font-bold">₹{{ order.totalAmount | number:'1.2-2' }}</td>
+              <td class="text-muted">{{ order.orderDate | date:'mediumDate' }}</td>
+              <td class="text-right" (click)="$event.stopPropagation()">
+                <div class="action-buttons">
+                  <button class="btn-action-icon inspect" (click)="openOrderDetails(order)" matTooltip="Inspect BOM & Shortages">
+                    <mat-icon>schema</mat-icon>
+                  </button>
+                  @if (order.status !== 'INVOICED' && order.status !== 'PAID') {
+                    <button class="btn-action-icon invoice" (click)="openInvoiceModal(order.id)" matTooltip="Generate Tax Invoice">
+                      <mat-icon>receipt_long</mat-icon>
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (filteredOrders.length === 0) {
+        <div class="empty-state">
+          <mat-icon>inbox</mat-icon>
+          <h3>No sales orders found</h3>
+          <p>Try modifying your search or click "New Sales Order" to register a client requisition.</p>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ORDER DETAILS & BOM EXPLODED SHORTAGES DRAWER -->
+  @if (selectedOrder) {
+    <div class="drawer-overlay" (click)="closeOrderDetails()">
+      <div class="drawer-panel" (click)="$event.stopPropagation()">
+        <!-- Drawer Header -->
+        <div class="drawer-header">
+          <div class="drawer-title-row">
+            <span class="status-chip" [attr.data-status]="selectedOrder.status">{{ selectedOrder.status }}</span>
+            <h3>{{ selectedOrder.orderNo }}</h3>
+          </div>
+          <button class="close-icon-btn" (click)="closeOrderDetails()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="drawer-body">
+          <!-- Client & Order Info -->
+          <div class="info-card">
+            <div class="info-item">
+              <span class="label">Customer</span>
+              <span class="val font-bold">{{ selectedOrder.customer?.name || selectedOrder.customerName }}</span>
+              <span class="sub">{{ selectedOrder.customer?.email }} | {{ selectedOrder.customer?.phone }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Order Date</span>
+              <span class="val">{{ selectedOrder.orderDate | date:'fullDate' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Order Total</span>
+              <span class="val font-bold text-primary">₹{{ selectedOrder.totalAmount | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Finished Goods Items List -->
+          <div class="section-box">
+            <h4 class="section-title">
+              <mat-icon>precision_manufacturing</mat-icon>
+              <span>Ordered Finished Goods</span>
+            </h4>
+            <div class="items-list-compact">
+              @for (item of selectedOrder.items; track item.id) {
+                <div class="item-compact-row">
+                  <div class="item-meta">
+                    <strong>{{ item.product?.name || 'Finished Product' }}</strong>
+                    <span class="mono text-muted">SKU: {{ item.product?.sku || 'PROD-N/A' }}</span>
+                  </div>
+                  <div class="item-calc">
+                    <span>{{ item.quantity }} units &times; ₹{{ item.unitPrice | number:'1.2-2' }}</span>
+                    <strong class="mono">₹{{ item.lineTotal || (item.quantity * item.unitPrice) | number:'1.2-2' }}</strong>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- BOM Explosions & Shortages Section -->
+          <div class="section-box bom-box">
+            <div class="section-header-row">
+              <h4 class="section-title">
+                <mat-icon>schema</mat-icon>
+                <span>Exploded Bill of Materials & Stock Shortages</span>
+              </h4>
+              <button
+                class="btn-auto-po"
+                [disabled]="isGeneratingPO"
+                (click)="autoGeneratePurchaseOrders()"
+              >
+                @if (isGeneratingPO) {
+                  <mat-spinner diameter="16"></mat-spinner>
+                  <span>Issuing POs...</span>
+                } @else {
+                  <mat-icon>electric_bolt</mat-icon>
+                  <span>Auto-Generate Purchase Orders</span>
+                }
+              </button>
+            </div>
+
+            @if (poSuccessMessage) {
+              <div class="po-feedback-banner">
+                <mat-icon>verified</mat-icon>
+                <span>{{ poSuccessMessage }}</span>
+              </div>
+            }
+
+            @if (isLoadingBom) {
+              <div class="bom-loading">
+                <mat-spinner diameter="28"></mat-spinner>
+                <p>Calculating exploded raw material requirements...</p>
+              </div>
+            } @else {
+              <div class="bom-table-wrap">
+                <table class="oc-table compact">
+                  <thead>
+                    <tr>
+                      <th>Material Code</th>
+                      <th>Material Name</th>
+                      <th>Required</th>
+                      <th>In Stock</th>
+                      <th>Shortage</th>
+                      <th>Supplier</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (req of bomRequirements; track req.materialId) {
+                      <tr [class.shortage-row]="req.shortageQty > 0">
+                        <td class="mono font-bold">{{ req.materialCode }}</td>
+                        <td>{{ req.materialName }}</td>
+                        <td class="mono font-semibold">{{ req.requiredQty }} {{ req.unit }}</td>
+                        <td class="mono">{{ req.availableQty }} {{ req.unit }}</td>
+                        <td>
+                          @if (req.shortageQty > 0) {
+                            <span class="shortage-badge danger">
+                              Shortage: {{ req.shortageQty }} {{ req.unit }}
+                            </span>
+                          } @else {
+                            <span class="shortage-badge success">
+                              Ready in Stock
+                            </span>
+                          }
+                        </td>
+                        <td class="text-muted">{{ req.supplierName || 'Unassigned' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Drawer Footer -->
+        <div class="drawer-footer">
+          <button class="oc-btn-secondary" (click)="closeOrderDetails()">Close</button>
+          @if (selectedOrder.status !== 'INVOICED' && selectedOrder.status !== 'PAID') {
+            <button class="oc-btn-primary" (click)="openInvoiceModal(selectedOrder.id)">
+              <mat-icon>receipt_long</mat-icon>
+              <span>Generate Tax Invoice</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- NEW SALES ORDER MODAL DIALOG -->
+  @if (isCreateModalOpen) {
+    <div class="dialog-backdrop" (click)="closeCreateModal()">
+      <div class="dialog-box large" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <div class="dialog-title-group">
+            <mat-icon class="title-icon">note_add</mat-icon>
+            <div>
+              <h3>Create New Sales Order</h3>
+              <p>Configure client order items for manufacturing BOM calculation</p>
+            </div>
+          </div>
+          <button class="close-icon-btn" (click)="closeCreateModal()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <form [formGroup]="orderForm" (ngSubmit)="onSubmitNewOrder()">
+          <div class="dialog-body">
+            <!-- Customer Picker -->
+            <div class="form-group">
+              <label>Select Customer <span class="required">*</span></label>
+              <select formControlName="customerId" class="form-select">
+                <option [ngValue]="null" disabled>Choose industrial customer account...</option>
+                @for (c of customers; track c.id) {
+                  <option [ngValue]="c.id">{{ c.name }} ({{ c.address }})</option>
+                }
+              </select>
+            </div>
+
+            <!-- Product Line Items -->
+            <div class="section-subtitle-row">
+              <h4>Ordered Products</h4>
+              <button type="button" class="btn-add-item" (click)="addItemRow()">
+                <mat-icon>add</mat-icon>
+                <span>Add Product</span>
+              </button>
+            </div>
+
+            <div formArrayName="items" class="line-items-table-wrap">
+              <table class="items-input-table">
+                <thead>
+                  <tr>
+                    <th style="width: 45%;">Product (Finished Good)</th>
+                    <th style="width: 20%;">Unit Price</th>
+                    <th style="width: 20%;">Quantity</th>
+                    <th style="width: 15%;" class="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (ctrl of itemsFormArray.controls; track $index) {
+                    <tr [formGroupName]="$index">
+                      <td>
+                        <select formControlName="productId" class="form-select table-select">
+                          <option [ngValue]="null" disabled>Select Product SKU...</option>
+                          @for (p of products; track p.id) {
+                            <option [ngValue]="p.id">{{ p.name }} ({{ p.sku }}) — ₹{{ p.unitPrice }}</option>
+                          }
+                        </select>
+                      </td>
+                      <td class="mono font-semibold">
+                        ₹{{ getItemUnitPrice(ctrl.get('productId')?.value) | number:'1.2-2' }}
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          min="1"
+                          formControlName="quantity"
+                          class="form-input qty-input mono"
+                        />
+                      </td>
+                      <td class="text-right">
+                        <button
+                          type="button"
+                          class="btn-remove-row"
+                          (click)="removeItemRow($index)"
+                          [disabled]="itemsFormArray.length <= 1"
+                        >
+                          <mat-icon>delete_outline</mat-icon>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Total Preview Banner -->
+            <div class="order-total-preview">
+              <span class="preview-label">Estimated Order Total:</span>
+              <span class="preview-val mono">₹{{ calculateLiveTotal() | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="dialog-footer">
+            <button type="button" class="oc-btn-secondary" (click)="closeCreateModal()">Cancel</button>
+            <button
+              type="submit"
+              class="oc-btn-primary"
+              [disabled]="orderForm.invalid || itemsFormArray.length === 0"
+            >
+              <mat-icon>check_circle</mat-icon>
+              <span>Confirm & Generate BOM</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- GENERATE INVOICE MODAL DIALOG -->
+  @if (isInvoiceModalOpen) {
+    <div class="dialog-backdrop" (click)="closeInvoiceModal()">
+      <div class="dialog-box" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <div class="dialog-title-group">
+            <mat-icon class="title-icon">receipt_long</mat-icon>
+            <div>
+              <h3>Generate Manufacturing Tax Invoice</h3>
+              <p>Creates accounts receivable invoice linked to Sales Order #{{ invoiceOrderId }}</p>
+            </div>
+          </div>
+          <button class="close-icon-btn" (click)="closeInvoiceModal()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <div class="dialog-body">
+          @if (invoiceMessage) {
+            <div class="po-feedback-banner">
+              <mat-icon>info</mat-icon>
+              <span>{{ invoiceMessage }}</span>
+            </div>
+          }
+
+          <div class="form-group">
+            <label>Payment Due Date</label>
+            <input type="date" [(ngModel)]="invoiceDueDate" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label>GST / Tax Rate (%)</label>
+            <input type="number" step="0.5" min="0" [(ngModel)]="invoiceTaxRate" class="form-input mono" />
+            <span class="input-hint">Standard GST for manufactured capital goods is 18.0%</span>
+          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <button type="button" class="oc-btn-secondary" (click)="closeInvoiceModal()">Cancel</button>
+          <button type="button" class="oc-btn-primary" (click)="confirmGenerateInvoice()">
+            <mat-icon>send</mat-icon>
+            <span>Issue Invoice</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

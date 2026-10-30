@@ -1,0 +1,257 @@
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-content">
+      <span class="welcome-tag">Manufacturing Operations Center</span>
+      <h1 class="welcome-title">Welcome back, {{ username || 'Operator' }}</h1>
+      <p class="welcome-desc">
+        OrderCraft automates your end-to-end manufacturing workflow from customer order receipt to bill-of-materials generation, procurement, and accounts settlement.
+      </p>
+    </div>
+    <div class="quick-actions">
+      <button class="oc-btn-primary" (click)="navigateToOrders()">
+        <mat-icon>add_circle</mat-icon>
+        <span>New Sales Order</span>
+      </button>
+      <button class="oc-btn-secondary" (click)="navigateToProcurement()">
+        <mat-icon>shopping_cart</mat-icon>
+        <span>Procure Materials</span>
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-spinner diameter="45"></mat-spinner>
+      <p>Synchronizing operational telemetry...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="telemetry-error-card">
+      <div class="error-badge-icon">
+        <mat-icon>warning_amber</mat-icon>
+      </div>
+      <div class="error-details">
+        <h3>Operational Telemetry Unavailable</h3>
+        <p>{{ errorMessage }}</p>
+      </div>
+      <button class="oc-btn-primary retry-btn" (click)="loadMetrics()">
+        <mat-icon>sync</mat-icon>
+        <span>Retry Connection</span>
+      </button>
+    </div>
+  } @else if (metrics) {
+    <!-- KPI Stat Cards Grid -->
+    <div class="stats-grid">
+      <div class="stat-card primary" (click)="navigateToOrders()">
+        <div class="stat-icon primary">
+          <mat-icon>monetization_on</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Order Pipeline Value</span>
+          <span class="stat-value">₹{{ metrics.totalRevenue | number:'1.2-2' }}</span>
+          <span class="stat-sub">{{ metrics.workflowStages.salesOrdersCount }} total registered orders</span>
+        </div>
+      </div>
+
+      <div class="stat-card cyan" (click)="navigateToOrders()">
+        <div class="stat-icon cyan">
+          <mat-icon>precision_manufacturing</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Active Production</span>
+          <span class="stat-value">{{ metrics.activeOrdersCount }}</span>
+          <span class="stat-sub">Orders currently in manufacturing</span>
+        </div>
+      </div>
+
+      <div class="stat-card danger" (click)="navigateToMaterials()">
+        <div class="stat-icon danger" [class.alert-pulse]="metrics.criticalStockMaterialsCount > 0">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Critical Stock Alerts</span>
+          <span class="stat-value">{{ metrics.criticalStockMaterialsCount }}</span>
+          <span class="stat-sub">Materials requiring procurement</span>
+        </div>
+      </div>
+
+      <div class="stat-card warning" (click)="navigateToInvoices()">
+        <div class="stat-icon warning">
+          <mat-icon>pending_actions</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Uncollected Receivables</span>
+          <span class="stat-value">₹{{ metrics.unpaidInvoicesAmount | number:'1.2-2' }}</span>
+          <span class="stat-sub">Pending customer invoice clearance</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manufacturing Order-to-Cash Workflow Visual Pipeline -->
+    <div class="workflow-card">
+      <div class="card-header">
+        <div class="header-titles">
+          <h3>Order-to-Cash Manufacturing Flow</h3>
+          <p>Real-time lifecycle distribution across operational stages</p>
+        </div>
+        <span class="badge-live">Live Pipeline</span>
+      </div>
+
+      <div class="pipeline-track">
+        <!-- Step 1 -->
+        <div class="pipeline-step" (click)="navigateToOrders()">
+          <div class="step-icon-box">
+            <mat-icon>shopping_bag</mat-icon>
+            <span class="step-count">{{ metrics.workflowStages.salesOrdersCount }}</span>
+          </div>
+          <span class="step-name">1. Customer Orders</span>
+          <span class="step-status">Confirmed</span>
+        </div>
+
+        <div class="pipeline-arrow"><mat-icon>arrow_forward</mat-icon></div>
+
+        <!-- Step 2 -->
+        <div class="pipeline-step" (click)="navigateToOrders()">
+          <div class="step-icon-box highlight">
+            <mat-icon>schema</mat-icon>
+            <span class="step-count">{{ metrics.workflowStages.bomExplodedCount }}</span>
+          </div>
+          <span class="step-name">2. BOM & Shortages</span>
+          <span class="step-status">Exploded</span>
+        </div>
+
+        <div class="pipeline-arrow"><mat-icon>arrow_forward</mat-icon></div>
+
+        <!-- Step 3 -->
+        <div class="pipeline-step" (click)="navigateToProcurement()">
+          <div class="step-icon-box">
+            <mat-icon>local_shipping</mat-icon>
+            <span class="step-count">{{ metrics.workflowStages.purchaseOrdersCount }}</span>
+          </div>
+          <span class="step-name">3. Supplier POs</span>
+          <span class="step-status">Issued</span>
+        </div>
+
+        <div class="pipeline-arrow"><mat-icon>arrow_forward</mat-icon></div>
+
+        <!-- Step 4 -->
+        <div class="pipeline-step" (click)="navigateToMaterials()">
+          <div class="step-icon-box">
+            <mat-icon>inventory</mat-icon>
+            <span class="step-count">{{ metrics.workflowStages.goodsReceivedCount }}</span>
+          </div>
+          <span class="step-name">4. Goods Receipt</span>
+          <span class="step-status">Stocked</span>
+        </div>
+
+        <div class="pipeline-arrow"><mat-icon>arrow_forward</mat-icon></div>
+
+        <!-- Step 5 -->
+        <div class="pipeline-step" (click)="navigateToInvoices()">
+          <div class="step-icon-box">
+            <mat-icon>receipt</mat-icon>
+            <span class="step-count">{{ metrics.workflowStages.invoicedCount }}</span>
+          </div>
+          <span class="step-name">5. Invoicing</span>
+          <span class="step-status">Billed</span>
+        </div>
+
+        <div class="pipeline-arrow"><mat-icon>arrow_forward</mat-icon></div>
+
+        <!-- Step 6 -->
+        <div class="pipeline-step" (click)="navigateToInvoices()">
+          <div class="step-icon-box success">
+            <mat-icon>task_alt</mat-icon>
+            <span class="step-count">{{ metrics.workflowStages.paidCount }}</span>
+          </div>
+          <span class="step-name">6. Settlement</span>
+          <span class="step-status">Complete</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dual Column Section: Recent Orders & Material Stock Alerts -->
+    <div class="dashboard-grid">
+      <!-- Recent Orders Column -->
+      <div class="grid-card">
+        <div class="card-header">
+          <div class="header-titles">
+            <h3>Recent Sales Orders</h3>
+            <p>Latest manufacturing commitments and client requisitions</p>
+          </div>
+          <a routerLink="/orders" class="view-all-link">View All &rarr;</a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="oc-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Amount</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of metrics.recentOrders; track order.id) {
+                <tr class="clickable-row" (click)="navigateToOrders()">
+                  <td class="mono font-semibold">{{ order.orderNo }}</td>
+                  <td>{{ order.customer?.name || order.customerName }}</td>
+                  <td>
+                    <span class="status-chip" [attr.data-status]="order.status">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                  <td class="mono font-semibold">₹{{ order.totalAmount | number:'1.2-2' }}</td>
+                  <td class="text-muted">{{ order.orderDate | date:'mediumDate' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Critical Inventory Alerts -->
+      <div class="grid-card">
+        <div class="card-header">
+          <div class="header-titles">
+            <h3>Material Stock Watchlist</h3>
+            <p>Raw items currently below safety buffer thresholds</p>
+          </div>
+          <a routerLink="/materials" class="view-all-link">Manage Inventory &rarr;</a>
+        </div>
+
+        <div class="stock-alerts-list">
+          @for (mat of metrics.lowStockMaterials; track mat.id) {
+            <div class="stock-alert-item">
+              <div class="alert-icon-wrap">
+                <mat-icon>layers_clear</mat-icon>
+              </div>
+              <div class="alert-info">
+                <div class="alert-title-row">
+                  <span class="mat-code">{{ mat.code }}</span>
+                  <span class="stock-badge danger">Low: {{ mat.stockQty }} {{ mat.unit }}</span>
+                </div>
+                <span class="mat-name">{{ mat.name }}</span>
+                <span class="mat-supplier">Supplier: {{ mat.supplier?.name || 'Unassigned' }}</span>
+              </div>
+              <button class="btn-quick-po" (click)="navigateToProcurement()" matTooltip="Create Purchase Order">
+                <mat-icon>add_shopping_cart</mat-icon>
+              </button>
+            </div>
+          }
+
+          @if (metrics.lowStockMaterials.length === 0) {
+            <div class="empty-watchlist">
+              <mat-icon>check_circle</mat-icon>
+              <p>All raw materials are above minimum safety stock thresholds.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
