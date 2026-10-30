@@ -30,7 +30,7 @@ public class BomService {
 
     public List<BomItem> getBomByProduct(Long productId) {
         if (!productRepository.existsById(productId)) {
-            throw new IllegalArgumentException("Product not found with ID: " + productId);
+            return java.util.Collections.emptyList();
         }
         return bomItemRepository.findByProductId(productId);
     }

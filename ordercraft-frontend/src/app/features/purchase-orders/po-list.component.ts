@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -42,6 +42,8 @@ export class PoListComponent implements OnInit {
   private materialService = inject(MaterialService);
   private orderService = inject(OrderService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   purchaseOrders: PurchaseOrder[] = [];
   filteredPOs: PurchaseOrder[] = [];
@@ -82,16 +84,13 @@ export class PoListComponent implements OnInit {
     this.errorMessage = '';
     this.poService.getAll().pipe(
       timeout(10000),
-      finalize(() => {
-        this.isLoading = false;
-      })
+      finalize(() => { this.ngZone.run(() => { this.isLoading = false; this.cdr.detectChanges(); }); })
     ).subscribe({
       next: (data) => {
-        this.purchaseOrders = data || [];
-        this.applyFilter();
+        this.ngZone.run(() => { this.purchaseOrders = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.errorMessage = 'Failed to load purchase orders. Check backend connection.';
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load purchase orders. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }
@@ -210,3 +209,5 @@ export class PoListComponent implements OnInit {
       });
   }
 }
+
+

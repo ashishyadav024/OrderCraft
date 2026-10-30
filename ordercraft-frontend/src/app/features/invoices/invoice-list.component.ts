@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -33,6 +33,8 @@ import { Invoice, Payment } from '../../shared/models/procurement-invoice.model'
 export class InvoiceListComponent implements OnInit {
   private invoiceService = inject(InvoiceService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   invoices: Invoice[] = [];
   filteredInvoices: Invoice[] = [];
@@ -66,16 +68,13 @@ export class InvoiceListComponent implements OnInit {
     this.errorMessage = '';
     this.invoiceService.getAll().pipe(
       timeout(10000),
-      finalize(() => {
-        this.isLoading = false;
-      })
+      finalize(() => { this.ngZone.run(() => { this.isLoading = false; this.cdr.detectChanges(); }); })
     ).subscribe({
       next: (data) => {
-        this.invoices = data || [];
-        this.applyFilter();
+        this.ngZone.run(() => { this.invoices = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.errorMessage = 'Failed to load invoices. Check backend connection.';
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load invoices. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }
@@ -197,3 +196,5 @@ export class InvoiceListComponent implements OnInit {
       });
   }
 }
+
+

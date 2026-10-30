@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -37,6 +37,8 @@ export class ProductListComponent implements OnInit {
   private bomService = inject(BomService);
   private materialService = inject(MaterialService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   products: Product[] = [];
   filteredProducts: Product[] = [];
@@ -68,7 +70,10 @@ export class ProductListComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchProducts();
-    this.materialService.getAll().subscribe((m) => (this.materials = m));
+    this.materialService.getAll().subscribe((m) => {
+      this.materials = m || [];
+      this.cdr.detectChanges();
+    });
   }
 
   fetchProducts(): void {
@@ -76,16 +81,13 @@ export class ProductListComponent implements OnInit {
     this.errorMessage = '';
     this.productService.getAll().pipe(
       timeout(10000),
-      finalize(() => {
-        this.isLoading = false;
-      })
+      finalize(() => { this.ngZone.run(() => { this.isLoading = false; this.cdr.detectChanges(); }); })
     ).subscribe({
       next: (data) => {
-        this.products = data || [];
-        this.applyFilter();
+        this.ngZone.run(() => { this.products = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.errorMessage = 'Failed to load products. Check backend connection.';
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load products. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }
@@ -174,13 +176,18 @@ export class ProductListComponent implements OnInit {
       timeout(10000),
       finalize(() => {
         this.isLoadingBom = false;
+        this.cdr.detectChanges();
       })
     ).subscribe({
       next: (items) => {
         this.bomItems = items || [];
+        this.isLoadingBom = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.bomItems = [];
+        this.isLoadingBom = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -232,3 +239,4 @@ export class ProductListComponent implements OnInit {
     return Number((((price - cost) / price) * 100).toFixed(1));
   }
 }
+

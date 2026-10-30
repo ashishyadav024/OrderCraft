@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -31,6 +31,8 @@ import { Supplier } from '../../shared/models/supplier.model';
 export class SupplierListComponent implements OnInit {
   private supplierService = inject(SupplierService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   suppliers: Supplier[] = [];
   filteredSuppliers: Supplier[] = [];
@@ -58,16 +60,13 @@ export class SupplierListComponent implements OnInit {
     this.errorMessage = '';
     this.supplierService.getAll().pipe(
       timeout(10000),
-      finalize(() => {
-        this.isLoading = false;
-      })
+      finalize(() => { this.ngZone.run(() => { this.isLoading = false; this.cdr.detectChanges(); }); })
     ).subscribe({
       next: (data) => {
-        this.suppliers = data || [];
-        this.applyFilter();
+        this.ngZone.run(() => { this.suppliers = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.errorMessage = 'Failed to load suppliers. Check backend connection.';
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load suppliers. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }
@@ -140,3 +139,4 @@ export class SupplierListComponent implements OnInit {
     }
   }
 }
+

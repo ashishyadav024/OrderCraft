@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -43,6 +43,8 @@ export class OrderListComponent implements OnInit {
   private poService = inject(PurchaseOrderService);
   private invoiceService = inject(InvoiceService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   orders: Order[] = [];
   filteredOrders: Order[] = [];
@@ -88,8 +90,14 @@ export class OrderListComponent implements OnInit {
   }
 
   loadDropdownData(): void {
-    this.customerService.getAll().subscribe((c) => (this.customers = c));
-    this.productService.getAll().subscribe((p) => (this.products = p));
+    this.customerService.getAll().subscribe((c) => {
+      this.customers = c || [];
+      this.cdr.detectChanges();
+    });
+    this.productService.getAll().subscribe((p) => {
+      this.products = p || [];
+      this.cdr.detectChanges();
+    });
   }
 
   fetchOrders(): void {
@@ -98,16 +106,13 @@ export class OrderListComponent implements OnInit {
 
     this.orderService.getOrders().pipe(
       timeout(10000),
-      finalize(() => {
-        this.isLoading = false;
-      })
+      finalize(() => { this.ngZone.run(() => { this.isLoading = false; this.cdr.detectChanges(); }); })
     ).subscribe({
       next: (data) => {
-        this.orders = data || [];
-        this.applyFilter();
+        this.ngZone.run(() => { this.orders = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.errorMessage = 'Failed to load orders. Check backend connection.';
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load orders. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }
@@ -154,13 +159,18 @@ export class OrderListComponent implements OnInit {
       timeout(10000),
       finalize(() => {
         this.isLoadingBom = false;
+        this.cdr.detectChanges();
       })
     ).subscribe({
       next: (reqs) => {
         this.bomRequirements = reqs || [];
+        this.isLoadingBom = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.bomRequirements = [];
+        this.isLoadingBom = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -177,13 +187,14 @@ export class OrderListComponent implements OnInit {
           this.poSuccessMessage = 'All required materials are already adequately in stock!';
         } else {
           this.poSuccessMessage = `Successfully created ${generated.length} Purchase Order(s) for material shortages!`;
-          // Reload BOM to update available/shortage numbers
           this.loadOrderBom(this.selectedOrder!.id);
         }
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isGeneratingPO = false;
         this.poSuccessMessage = 'Error generating Purchase Orders.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -220,6 +231,7 @@ export class OrderListComponent implements OnInit {
               this.selectedOrder.status = 'INVOICED';
             }
           }, 1200);
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.invoiceMessage = err?.error?.message || 'Invoice generation completed.';
@@ -227,6 +239,7 @@ export class OrderListComponent implements OnInit {
             this.closeInvoiceModal();
             this.fetchOrders();
           }, 1200);
+          this.cdr.detectChanges();
         }
       });
   }
@@ -235,7 +248,7 @@ export class OrderListComponent implements OnInit {
   openCreateModal(): void {
     this.orderForm.reset();
     this.itemsFormArray.clear();
-    this.addItemRow(); // Start with 1 line item
+    this.addItemRow();
     this.isCreateModalOpen = true;
   }
 
@@ -301,3 +314,5 @@ export class OrderListComponent implements OnInit {
       });
   }
 }
+
+

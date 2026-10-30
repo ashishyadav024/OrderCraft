@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -32,6 +32,8 @@ export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   loginForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
@@ -78,20 +80,26 @@ export class LoginComponent implements OnInit {
       timeout(5000)
     ).subscribe({
       next: () => {
-        this.isLoading = false;
-        this.router.navigateByUrl(this.returnUrl);
+        this.ngZone.run(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          this.router.navigateByUrl(this.returnUrl);
+        });
       },
       error: (err) => {
-        this.isLoading = false;
-        if (err.name === 'TimeoutError') {
-          this.errorMessage = 'Login timed out. Check backend connection on port 8085.';
-        } else if (err.status === 401) {
-          this.errorMessage = 'Invalid username or password.';
-        } else if (err.status === 0) {
-          this.errorMessage = 'Backend server unavailable. Please ensure Spring Boot is running on port 8085.';
-        } else {
-          this.errorMessage = 'Login failed. Please verify credentials.';
-        }
+        this.ngZone.run(() => {
+          this.isLoading = false;
+          if (err.name === 'TimeoutError') {
+            this.errorMessage = 'Login timed out. Check backend connection on port 8085.';
+          } else if (err.status === 401) {
+            this.errorMessage = 'Invalid username or password.';
+          } else if (err.status === 0) {
+            this.errorMessage = 'Backend server unavailable. Please ensure Spring Boot is running on port 8085.';
+          } else {
+            this.errorMessage = 'Login failed. Please verify credentials.';
+          }
+          this.cdr.detectChanges();
+        });
       }
     });
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -31,6 +31,8 @@ import { Customer } from '../../shared/models/customer.model';
 export class CustomerListComponent implements OnInit {
   private customerService = inject(CustomerService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   customers: Customer[] = [];
   filteredCustomers: Customer[] = [];
@@ -58,16 +60,13 @@ export class CustomerListComponent implements OnInit {
     this.errorMessage = '';
     this.customerService.getAll().pipe(
       timeout(10000),
-      finalize(() => {
-        this.isLoading = false;
-      })
+      finalize(() => { this.ngZone.run(() => { this.isLoading = false; this.cdr.detectChanges(); }); })
     ).subscribe({
       next: (data) => {
-        this.customers = data || [];
-        this.applyFilter();
+        this.ngZone.run(() => { this.customers = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.errorMessage = 'Failed to load customers. Check backend connection.';
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load customers. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }
@@ -140,3 +139,4 @@ export class CustomerListComponent implements OnInit {
     }
   }
 }
+

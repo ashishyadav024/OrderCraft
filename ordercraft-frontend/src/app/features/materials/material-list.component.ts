@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -35,6 +35,8 @@ export class MaterialListComponent implements OnInit {
   private materialService = inject(MaterialService);
   private supplierService = inject(SupplierService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   materials: Material[] = [];
   filteredMaterials: Material[] = [];
@@ -60,7 +62,10 @@ export class MaterialListComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchMaterials();
-    this.supplierService.getAll().subscribe((s) => (this.suppliers = s));
+    this.supplierService.getAll().subscribe((s) => {
+      this.suppliers = s || [];
+      this.cdr.detectChanges();
+    });
   }
 
   fetchMaterials(): void {
@@ -68,16 +73,15 @@ export class MaterialListComponent implements OnInit {
     this.errorMessage = '';
     this.materialService.getAll().pipe(
       timeout(10000),
-      finalize(() => {
-        this.isLoading = false;
-      })
+      finalize(() => { this.ngZone.run(() => { this.isLoading = false; this.cdr.detectChanges(); }); })
     ).subscribe({
       next: (data) => {
-        this.materials = data || [];
-        this.applyFilter();
+        this.ngZone.run(() => { this.materials = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
         this.errorMessage = 'Failed to load materials inventory. Check backend connection.';
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -184,3 +188,4 @@ export class MaterialListComponent implements OnInit {
     return this.materials.filter((m) => m.stockQty < 50).length;
   }
 }
+

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { finalize, timeout } from 'rxjs/operators';
@@ -33,6 +33,8 @@ export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
   metrics: DashboardMetrics | null = null;
   isLoading = true;
@@ -51,16 +53,27 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.getMetrics().pipe(
       timeout(10000),
       finalize(() => {
-        this.isLoading = false;
+        this.ngZone.run(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
       })
     ).subscribe({
       next: (data) => {
-        this.metrics = data;
-        this.errorMessage = null;
+        this.ngZone.run(() => {
+          this.metrics = data;
+          this.errorMessage = null;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
-        console.error('Failed to load operational telemetry:', err);
-        this.errorMessage = 'Unable to synchronize operational telemetry. Please check backend connection and retry.';
+        this.ngZone.run(() => {
+          console.error('Failed to load operational telemetry:', err);
+          this.errorMessage = 'Unable to synchronize operational telemetry. Please check backend connection and retry.';
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
       }
     });
   }
