@@ -25,42 +25,37 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   // 1. Proxy API requests to backend
   if (req.url.startsWith('/api')) {
-    const chunks = [];
-    req.on('data', chunk => chunks.push(chunk));
-    req.on('end', () => {
-      const body = Buffer.concat(chunks);
-      const proxyHeaders = { ...req.headers };
-      delete proxyHeaders['host'];
-      delete proxyHeaders['connection'];
-      proxyHeaders['host'] = `127.0.0.1:${BACKEND_PORT}`;
-      if (body.length > 0) {
-        proxyHeaders['content-length'] = body.length;
-      }
+    const startTime = Date.now();
+    const proxyHeaders = { ...req.headers };
+    delete proxyHeaders['host'];
+    delete proxyHeaders['connection'];
+    proxyHeaders['host'] = `127.0.0.1:${BACKEND_PORT}`;
 
-      const proxyReq = http.request({
-        hostname: '127.0.0.1',
-        port: BACKEND_PORT,
-        path: req.url,
-        method: req.method,
-        headers: proxyHeaders
-      }, (proxyRes) => {
-        res.writeHead(proxyRes.statusCode, proxyRes.headers);
-        proxyRes.pipe(res);
-      });
-
-      proxyReq.on('error', (err) => {
-        console.error(`Proxy Error on ${req.method} ${req.url}:`, err.message);
-        if (!res.headersSent) {
-          res.writeHead(502, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Backend unreachable on port ' + BACKEND_PORT + ': ' + err.message }));
-        }
-      });
-
-      if (body.length > 0) {
-        proxyReq.write(body);
-      }
-      proxyReq.end();
+    const proxyReq = http.request({
+      hostname: '127.0.0.1',
+      port: BACKEND_PORT,
+      path: req.url,
+      method: req.method,
+      headers: proxyHeaders
+    }, (proxyRes) => {
+      console.log(`[PROXY] ${req.method} ${req.url} -> ${proxyRes.statusCode} (${Date.now() - startTime}ms)`);
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
     });
+
+    proxyReq.on('error', (err) => {
+      console.error(`[PROXY ERROR] ${req.method} ${req.url}: ${err.message} (${Date.now() - startTime}ms)`);
+      if (!res.headersSent) {
+        res.writeHead(502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Backend unreachable on port ' + BACKEND_PORT + ': ' + err.message }));
+      }
+    });
+
+    if (req.method === 'GET' || req.method === 'HEAD') {
+      proxyReq.end();
+    } else {
+      req.pipe(proxyReq);
+    }
     return;
   }
 

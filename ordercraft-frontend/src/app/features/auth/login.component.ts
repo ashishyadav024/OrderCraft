@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { timeout } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -73,17 +74,21 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.login(this.loginForm.getRawValue()).subscribe({
+    this.authService.login(this.loginForm.getRawValue()).pipe(
+      timeout(5000)
+    ).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigateByUrl(this.returnUrl);
       },
       error: (err) => {
         this.isLoading = false;
-        if (err.status === 401) {
+        if (err.name === 'TimeoutError') {
+          this.errorMessage = 'Login timed out. Check backend connection on port 8085.';
+        } else if (err.status === 401) {
           this.errorMessage = 'Invalid username or password.';
         } else if (err.status === 0) {
-          this.errorMessage = 'Backend server unavailable. Connecting with OrderCraft In-Memory Session.';
+          this.errorMessage = 'Backend server unavailable. Please ensure Spring Boot is running on port 8085.';
         } else {
           this.errorMessage = 'Login failed. Please verify credentials.';
         }

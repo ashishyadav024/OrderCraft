@@ -27,31 +27,6 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials).pipe(
       tap((response: LoginResponse) => {
         this.setSession(response);
-      }),
-      catchError((error) => {
-        // Fallback for offline demo mode
-        const u = credentials.username.toLowerCase();
-        if (
-          (u === 'admin' && credentials.password === 'Admin@123') ||
-          (u === 'sales' && credentials.password === 'Sales@123') ||
-          (u === 'purchase' && credentials.password === 'Purchase@123') ||
-          (u === 'accounts' && credentials.password === 'Accounts@123')
-        ) {
-          const roleMap: Record<string, string> = {
-            admin: 'ADMIN',
-            sales: 'SALES',
-            purchase: 'PURCHASE',
-            accounts: 'ACCOUNTS'
-          };
-          const mockResponse: LoginResponse = {
-            token: 'demo-jwt-token-' + Date.now(),
-            username: credentials.username,
-            role: roleMap[u] || 'ADMIN'
-          };
-          this.setSession(mockResponse);
-          return of(mockResponse);
-        }
-        return throwError(() => error);
       })
     );
   }
