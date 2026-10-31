@@ -41,6 +41,7 @@ export class DashboardComponent implements OnInit {
   errorMessage: string | null = null;
   userRole = this.authService.getUserRole();
   username = this.authService.getUsername();
+  today = new Date();
 
   ngOnInit(): void {
     this.loadMetrics();

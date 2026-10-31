@@ -439,24 +439,25 @@
 }
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  background: var(--success);
   transition: width 300ms ease;
 }
 .progress-legend {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
 .method-tag {
-  background: #e0e7ff;
-  color: #3730a3;
+  background: var(--primary-subtle);
+  color: var(--primary);
+  border: 1px solid var(--primary-border);
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 600;
   padding: 2px 7px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 .drawer-footer {

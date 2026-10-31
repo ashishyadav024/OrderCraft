@@ -176,11 +176,11 @@
 }
 
 .btn-action-icon.inspect {
-  color: #4f46e5;
+  color: var(--primary);
 }
 .btn-action-icon.inspect:hover {
-  background: #eef2ff;
-  border-color: #c7d2fe;
+  background: var(--primary-subtle);
+  border-color: var(--primary-border);
 }
 
 .btn-action-icon.invoice {
@@ -413,23 +413,26 @@
 }
 
 .btn-auto-po {
-  background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+  background: var(--primary);
   color: #ffffff;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
   padding: 7px 14px;
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
   transition: all var(--transition-fast);
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
-.btn-auto-po:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+.btn-auto-po:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+.btn-auto-po:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 .btn-auto-po:disabled {
   opacity: 0.6;
