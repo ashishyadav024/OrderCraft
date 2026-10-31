@@ -1,115 +1,229 @@
 <header class="app-header">
   <div class="header-inner">
-    <!-- Brand -->
-    <a routerLink="/dashboard" class="brand-link">
-      <div class="brand-icon">
-        <mat-icon>precision_manufacturing</mat-icon>
-      </div>
-      <div class="brand-text">
-        <span class="brand-title">OrderCraft</span>
-        <span class="brand-subtitle">Manufacturing OMS</span>
-      </div>
-    </a>
+    <!-- Left: Brand & Mobile Toggle -->
+    <div class="header-left">
+      <!-- Mobile Hamburger Toggle (< 992px) -->
+      <button
+        type="button"
+        class="mobile-toggle-btn"
+        (click)="toggleMobileDrawer()"
+        aria-label="Toggle navigation menu"
+        [attr.aria-expanded]="isMobileDrawerOpen"
+      >
+        <mat-icon>{{ isMobileDrawerOpen ? 'close' : 'menu' }}</mat-icon>
+      </button>
 
-    <!-- Primary Nav Links -->
-    <nav class="nav-links">
-      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+      <!-- Brand Logo & Name -->
+      <a routerLink="/dashboard" class="brand-link" (click)="closeMobileDrawer()">
+        <div class="brand-icon">
+          <mat-icon>precision_manufacturing</mat-icon>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">OrderCraft</span>
+          <span class="brand-subtitle">Manufacturing OMS</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Center-Left: Desktop Navigation (>= 992px) -->
+    <nav class="nav-links desktop-nav" aria-label="Main Navigation">
+      <!-- 1. Dashboard -->
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+        title="Operations Dashboard"
+      >
         <mat-icon>dashboard</mat-icon>
         <span>Dashboard</span>
       </a>
 
-      <a routerLink="/orders" routerLinkActive="active" class="nav-item">
-        <mat-icon>assignment</mat-icon>
-        <span>Sales Orders</span>
-      </a>
+      <!-- 2. Sales (Dropdown: Orders, Customers) -->
+      <button
+        type="button"
+        class="nav-item nav-dropdown-btn"
+        [class.active]="isSalesActive()"
+        [matMenuTriggerFor]="salesMenu"
+        aria-label="Sales Navigation Menu"
+        aria-haspopup="true"
+      >
+        <mat-icon>point_of_sale</mat-icon>
+        <span>Sales</span>
+        <mat-icon class="dropdown-caret">expand_more</mat-icon>
+      </button>
+      <mat-menu #salesMenu="matMenu" class="oc-nav-dropdown-menu">
+        <a mat-menu-item routerLink="/orders">
+          <mat-icon>assignment</mat-icon>
+          <div class="menu-item-content">
+            <span class="menu-item-title">Sales Orders</span>
+            <span class="menu-item-desc">Create, confirm and track customer orders</span>
+          </div>
+        </a>
+        <a mat-menu-item routerLink="/customers">
+          <mat-icon>people</mat-icon>
+          <div class="menu-item-content">
+            <span class="menu-item-title">Customers</span>
+            <span class="menu-item-desc">Client companies and contact profiles</span>
+          </div>
+        </a>
+      </mat-menu>
 
-      <a routerLink="/products" routerLinkActive="active" class="nav-item">
-        <mat-icon>inventory_2</mat-icon>
-        <span>Products & BOM</span>
-      </a>
+      <!-- 3. Production (Dropdown: Products & BOM, Materials) -->
+      <button
+        type="button"
+        class="nav-item nav-dropdown-btn"
+        [class.active]="isProductionActive()"
+        [matMenuTriggerFor]="productionMenu"
+        aria-label="Production Navigation Menu"
+        aria-haspopup="true"
+      >
+        <mat-icon>precision_manufacturing</mat-icon>
+        <span>Production</span>
+        <mat-icon class="dropdown-caret">expand_more</mat-icon>
+      </button>
+      <mat-menu #productionMenu="matMenu" class="oc-nav-dropdown-menu">
+        <a mat-menu-item routerLink="/products">
+          <mat-icon>inventory_2</mat-icon>
+          <div class="menu-item-content">
+            <span class="menu-item-title">Products & BOM</span>
+            <span class="menu-item-desc">Finished goods, assemblies & bill-of-materials</span>
+          </div>
+        </a>
+        <a mat-menu-item routerLink="/materials">
+          <mat-icon>layers</mat-icon>
+          <div class="menu-item-content">
+            <span class="menu-item-title">Raw Materials</span>
+            <span class="menu-item-desc">Inventory stock, unit costs & valuations</span>
+          </div>
+        </a>
+      </mat-menu>
 
-      <a routerLink="/materials" routerLinkActive="active" class="nav-item">
-        <mat-icon>layers</mat-icon>
-        <span>Materials</span>
-      </a>
-
-      <a routerLink="/purchase-orders" routerLinkActive="active" class="nav-item">
+      <!-- 4. Procurement (Dropdown: Purchase Orders, Suppliers) -->
+      <button
+        type="button"
+        class="nav-item nav-dropdown-btn"
+        [class.active]="isProcurementActive()"
+        [matMenuTriggerFor]="procurementMenu"
+        aria-label="Procurement Navigation Menu"
+        aria-haspopup="true"
+      >
         <mat-icon>local_shipping</mat-icon>
         <span>Procurement</span>
-      </a>
+        <mat-icon class="dropdown-caret">expand_more</mat-icon>
+      </button>
+      <mat-menu #procurementMenu="matMenu" class="oc-nav-dropdown-menu">
+        <a mat-menu-item routerLink="/purchase-orders">
+          <mat-icon>local_shipping</mat-icon>
+          <div class="menu-item-content">
+            <span class="menu-item-title">Purchase Orders</span>
+            <span class="menu-item-desc">Procure materials and receive inventory</span>
+          </div>
+        </a>
+        <a mat-menu-item routerLink="/suppliers">
+          <mat-icon>business</mat-icon>
+          <div class="menu-item-content">
+            <span class="menu-item-title">Suppliers</span>
+            <span class="menu-item-desc">Vendor database and contact registry</span>
+          </div>
+        </a>
+      </mat-menu>
 
-      <a routerLink="/invoices" routerLinkActive="active" class="nav-item">
+      <!-- 5. Finance (Invoices & Payments) -->
+      <a
+        routerLink="/invoices"
+        routerLinkActive="active"
+        class="nav-item"
+        title="Finance: Invoices and Payments"
+      >
         <mat-icon>receipt_long</mat-icon>
-        <span>Invoices & Payments</span>
+        <span>Finance</span>
       </a>
 
-      <div class="nav-dropdown-wrapper">
-        <button mat-button [matMenuTriggerFor]="masterMenu" class="nav-item more-btn">
-          <mat-icon>category</mat-icon>
-          <span>Directories</span>
-          <mat-icon class="caret">arrow_drop_down</mat-icon>
-        </button>
-        <mat-menu #masterMenu="matMenu">
-          <a mat-menu-item routerLink="/customers">
-            <mat-icon>people</mat-icon>
-            <span>Customers</span>
+      <!-- 6. Reports/Admin (Dropdown) -->
+      <button
+        type="button"
+        class="nav-item nav-dropdown-btn"
+        [class.active]="isAdminActive()"
+        [matMenuTriggerFor]="adminMenu"
+        aria-label="Reports and Administration Menu"
+        aria-haspopup="true"
+      >
+        <mat-icon>admin_panel_settings</mat-icon>
+        <span>Reports/Admin</span>
+        <mat-icon class="dropdown-caret">expand_more</mat-icon>
+      </button>
+      <mat-menu #adminMenu="matMenu" class="oc-nav-dropdown-menu">
+        <a mat-menu-item routerLink="/dashboard">
+          <mat-icon>insights</mat-icon>
+          <div class="menu-item-content">
+            <span class="menu-item-title">Operations Telemetry</span>
+            <span class="menu-item-desc">KPI metrics, pipeline values & stock alerts</span>
+          </div>
+        </a>
+        @if (canAccess(['ADMIN'])) {
+          <a mat-menu-item routerLink="/users">
+            <mat-icon>manage_accounts</mat-icon>
+            <div class="menu-item-content">
+              <span class="menu-item-title">User Administration</span>
+              <span class="menu-item-desc">Manage accounts, operator roles & security</span>
+            </div>
           </a>
-          <a mat-menu-item routerLink="/suppliers">
-            <mat-icon>business</mat-icon>
-            <span>Suppliers</span>
-          </a>
-          @if (canAccess(['ADMIN'])) {
-            <a mat-menu-item routerLink="/users">
-              <mat-icon>admin_panel_settings</mat-icon>
-              <span>User Administration</span>
-            </a>
-          }
-        </mat-menu>
-      </div>
+        }
+      </mat-menu>
     </nav>
 
-    <!-- Right Utility Section -->
+    <!-- Right: User Profile + Role + Logout Menu -->
     <div class="header-right" *ngIf="user$ | async as user">
-      <!-- Role Switcher for seamless testing -->
+      <!-- Role Badge -->
+      <span class="role-badge" [ngClass]="user.role" [matTooltip]="'Active Role Profile: ' + user.role">
+        {{ user.role }}
+      </span>
+
+      <!-- User Profile Menu Trigger -->
       <button
+        type="button"
         mat-button
-        [matMenuTriggerFor]="roleMenu"
-        class="role-switch-btn"
-        matTooltip="Switch Role for Testing Access Control"
+        [matMenuTriggerFor]="userProfileMenu"
+        class="user-profile-btn"
+        aria-label="User account and profile menu"
+        aria-haspopup="true"
       >
-        <span class="role-pill" [ngClass]="user.role">{{ user.role }}</span>
-        <mat-icon class="switch-icon">swap_horiz</mat-icon>
+        <div class="avatar-circle">
+          {{ user.username.substring(0, 1).toUpperCase() }}
+        </div>
+        <span class="user-display-name">{{ user.username }}</span>
+        <mat-icon class="dropdown-caret">expand_more</mat-icon>
       </button>
 
-      <mat-menu #roleMenu="matMenu">
-        <div class="menu-header">Switch Role Profile:</div>
+      <!-- User Profile Menu -->
+      <mat-menu #userProfileMenu="matMenu" class="modern-user-menu" xPosition="before">
+        <div class="user-menu-header">
+          <div class="user-avatar-lg">
+            {{ user.username.substring(0, 1).toUpperCase() }}
+          </div>
+          <div class="user-details">
+            <span class="user-fullname">{{ user.username }}</span>
+            <span class="user-role-tag" [ngClass]="user.role">{{ user.role }} PROFILE</span>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="menu-section-title">Switch Role for Testing:</div>
         @for (r of availableRoles; track r) {
-          <button mat-menu-item (click)="onSwitchRole(r)" [class.selected]="r === user.role">
-            <mat-icon>{{ r === 'ADMIN' ? 'shield' : r === 'SALES' ? 'storefront' : r === 'PURCHASE' ? 'shopping_cart' : 'account_balance' }}</mat-icon>
+          <button mat-menu-item (click)="onSwitchRole(r)" [class.active-role-item]="r === user.role">
+            <mat-icon>{{ getRoleIcon(r) }}</mat-icon>
             <span>{{ r }}</span>
             @if (r === user.role) {
               <mat-icon class="check-icon">check</mat-icon>
             }
           </button>
         }
-      </mat-menu>
 
-      <!-- User Menu -->
-      <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
-        <div class="avatar-circle">
-          {{ user.username.substring(0, 1).toUpperCase() }}
-        </div>
-        <span class="user-name">{{ user.username }}</span>
-        <mat-icon class="caret">arrow_drop_down</mat-icon>
-      </button>
-
-      <mat-menu #userMenu="matMenu">
-        <div class="user-dropdown-info">
-          <strong>{{ user.username }}</strong>
-          <span class="user-role-label">{{ user.role }}</span>
-        </div>
         <mat-divider></mat-divider>
-        <button mat-menu-item (click)="onLogout()">
+
+        <button mat-menu-item (click)="onLogout()" class="logout-menu-item">
           <mat-icon>logout</mat-icon>
           <span>Sign Out</span>
         </button>
@@ -117,3 +231,144 @@
     </div>
   </div>
 </header>
+
+<!-- ==========================================================================
+     Mobile Responsive Sidenav Drawer (< 992px)
+     ========================================================================== -->
+<!-- Drawer Backdrop -->
+<div
+  class="mobile-drawer-backdrop"
+  *ngIf="isMobileDrawerOpen"
+  (click)="closeMobileDrawer()"
+  aria-hidden="true"
+></div>
+
+<!-- Drawer Aside Panel -->
+<aside
+  class="mobile-drawer"
+  [class.open]="isMobileDrawerOpen"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Mobile Navigation Drawer"
+>
+  <!-- Drawer Header -->
+  <div class="drawer-header">
+    <div class="drawer-brand">
+      <div class="brand-icon">
+        <mat-icon>precision_manufacturing</mat-icon>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">OrderCraft</span>
+        <span class="brand-subtitle">Manufacturing OMS</span>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="drawer-close-btn"
+      (click)="closeMobileDrawer()"
+      aria-label="Close navigation drawer"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Drawer User Profile Card -->
+  <div class="drawer-user-card" *ngIf="user$ | async as user">
+    <div class="drawer-avatar">
+      {{ user.username.substring(0, 1).toUpperCase() }}
+    </div>
+    <div class="drawer-user-info">
+      <span class="drawer-username">{{ user.username }}</span>
+      <span class="drawer-role-badge" [ngClass]="user.role">{{ user.role }} Profile</span>
+    </div>
+  </div>
+
+  <!-- Drawer Scrollable Navigation Links -->
+  <nav class="drawer-nav">
+    <div class="drawer-nav-section">
+      <span class="drawer-section-title">Overview</span>
+      <a routerLink="/dashboard" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+    </div>
+
+    <div class="drawer-nav-section">
+      <span class="drawer-section-title">Sales</span>
+      <a routerLink="/orders" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+        <mat-icon>assignment</mat-icon>
+        <span>Sales Orders</span>
+      </a>
+      <a routerLink="/customers" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+        <mat-icon>people</mat-icon>
+        <span>Customers</span>
+      </a>
+    </div>
+
+    <div class="drawer-nav-section">
+      <span class="drawer-section-title">Production</span>
+      <a routerLink="/products" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+        <mat-icon>inventory_2</mat-icon>
+        <span>Products & BOM</span>
+      </a>
+      <a routerLink="/materials" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+        <mat-icon>layers</mat-icon>
+        <span>Raw Materials</span>
+      </a>
+    </div>
+
+    <div class="drawer-nav-section">
+      <span class="drawer-section-title">Procurement</span>
+      <a routerLink="/purchase-orders" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+        <mat-icon>local_shipping</mat-icon>
+        <span>Purchase Orders</span>
+      </a>
+      <a routerLink="/suppliers" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+        <mat-icon>business</mat-icon>
+        <span>Suppliers</span>
+      </a>
+    </div>
+
+    <div class="drawer-nav-section">
+      <span class="drawer-section-title">Finance</span>
+      <a routerLink="/invoices" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+        <mat-icon>receipt_long</mat-icon>
+        <span>Invoices & Payments</span>
+      </a>
+    </div>
+
+    <div class="drawer-nav-section" *ngIf="canAccess(['ADMIN'])">
+      <span class="drawer-section-title">Administration</span>
+      <a routerLink="/users" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+        <mat-icon>manage_accounts</mat-icon>
+        <span>User Administration</span>
+      </a>
+    </div>
+
+    <!-- Quick Role Switcher in Mobile Drawer -->
+    <div class="drawer-nav-section" *ngIf="user$ | async as user">
+      <span class="drawer-section-title">Switch Role Profile</span>
+      <div class="drawer-role-grid">
+        @for (r of availableRoles; track r) {
+          <button
+            type="button"
+            class="drawer-role-btn"
+            [class.selected]="r === user.role"
+            (click)="onSwitchRole(r)"
+          >
+            <mat-icon>{{ getRoleIcon(r) }}</mat-icon>
+            <span>{{ r }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </nav>
+
+  <!-- Drawer Footer: Logout -->
+  <div class="drawer-footer">
+    <button type="button" class="drawer-logout-btn" (click)="onLogout()">
+      <mat-icon>logout</mat-icon>
+      <span>Sign Out</span>
+    </button>
+  </div>
+</aside>

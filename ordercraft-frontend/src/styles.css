@@ -85,6 +85,7 @@ html, body {
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 /* Custom Scrollbar */
@@ -415,4 +416,142 @@ button.oc-btn-primary:disabled {
 
 .alert-pulse {
   animation: pulseGlow 2s infinite;
+}
+
+
+/* ==========================================================================
+   OrderCraft Navbar Dropdown Menus (Dark Theme SaaS Styling)
+   ========================================================================== */
+.oc-nav-dropdown-menu.mat-mdc-menu-panel,
+.modern-user-menu.mat-mdc-menu-panel {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(99, 102, 241, 0.15) !important;
+  padding: 6px !important;
+  min-width: 250px !important;
+  max-width: 330px !important;
+}
+
+.oc-nav-dropdown-menu .mat-mdc-menu-item,
+.modern-user-menu .mat-mdc-menu-item {
+  color: #e2e8f0 !important;
+  border-radius: 8px !important;
+  margin-bottom: 2px !important;
+  height: auto !important;
+  min-height: 48px !important;
+  padding: 8px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  transition: background-color 150ms ease, color 150ms ease !important;
+}
+
+.oc-nav-dropdown-menu .mat-mdc-menu-item:hover,
+.modern-user-menu .mat-mdc-menu-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.oc-nav-dropdown-menu .mat-mdc-menu-item mat-icon,
+.modern-user-menu .mat-mdc-menu-item mat-icon {
+  color: #818cf8 !important;
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin-right: 0 !important;
+}
+
+.oc-nav-dropdown-menu .menu-item-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.oc-nav-dropdown-menu .menu-item-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  line-height: 1.25;
+}
+
+.oc-nav-dropdown-menu .menu-item-desc {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.modern-user-menu .user-menu-header {
+  padding: 12px 14px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modern-user-menu .user-avatar-lg {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: #ffffff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.modern-user-menu .user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.modern-user-menu .user-fullname {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+}
+
+.modern-user-menu .user-role-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 3px;
+}
+
+.modern-user-menu .user-role-tag.ADMIN { background: rgba(99, 102, 241, 0.25); color: #a5b4fc; }
+.modern-user-menu .user-role-tag.SALES { background: rgba(14, 165, 233, 0.25); color: #7dd3fc; }
+.modern-user-menu .user-role-tag.PURCHASE { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; }
+.modern-user-menu .user-role-tag.ACCOUNTS { background: rgba(245, 158, 11, 0.25); color: #fcd34d; }
+
+.modern-user-menu .menu-section-title {
+  padding: 8px 12px 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.05em;
+}
+
+.modern-user-menu .check-icon {
+  margin-left: auto;
+  color: #10b981 !important;
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.modern-user-menu .logout-menu-item {
+  color: #f87171 !important;
+}
+
+.modern-user-menu .logout-menu-item mat-icon {
+  color: #f87171 !important;
+}
+
+.modern-user-menu .logout-menu-item:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
 }
