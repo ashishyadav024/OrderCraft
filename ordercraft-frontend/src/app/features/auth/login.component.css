@@ -1,376 +1,348 @@
 /* ==========================================================================
-   OrderCraft Enterprise Authentication Theme
-   Clean Corporate ERP Layout (SAP Fiori / Zoho Books / Dynamics 365)
+   OrderCraft Authentication Component Styles
+   Enterprise Standard: Clean Centered Card, No Marketing Panels
    ========================================================================== */
 
-.login-page-container {
-  display: flex;
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.auth-page-container {
   min-height: 100vh;
   width: 100%;
-  background: var(--bg-page);
-  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-page, #F4F6F8);
+  padding: 32px 16px;
+  box-sizing: border-box;
+  font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
 }
 
 /* ----------------------------------------------------
-   Left Enterprise Showcase Panel (Corporate Solid #1F4E79)
+   Centered Authentication Card (max-width: 420px)
    ---------------------------------------------------- */
-.hero-showcase {
-  flex: 1.1;
-  background: #1F4E79;
-  border-right: 1px solid #173B5C;
-  padding: 56px 64px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: #FFFFFF;
-}
-
-.hero-content {
-  max-width: 560px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.brand-badge {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.brand-icon {
-  font-size: 32px;
-  width: 32px;
-  height: 32px;
-  color: #FFFFFF;
-}
-
-.brand-name {
-  font-size: 20px;
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: -0.01em;
-  display: block;
-}
-
-.brand-sub {
-  font-size: 11px;
-  font-weight: 500;
-  color: #B8D3EB;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  display: block;
-}
-
-.hero-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #FFFFFF;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  margin-bottom: 12px;
-}
-
-.hero-description {
-  font-size: 14px;
-  color: #D1E3F3;
-  line-height: 1.6;
-}
-
-.feature-pills-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-}
-
-.feature-card {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-sm);
-  padding: 14px;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.feature-icon-box {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-xs);
-  background: rgba(255, 255, 255, 0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #FFFFFF;
-  flex-shrink: 0;
-}
-
-.feature-icon-box mat-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-}
-
-.feature-text h4 {
-  font-size: 13px;
-  font-weight: 600;
-  color: #FFFFFF;
-  margin-bottom: 3px;
-}
-
-.feature-text p {
-  font-size: 11px;
-  color: #B8D3EB;
-  line-height: 1.4;
-}
-
-.hero-footer-status {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  font-size: 12px;
-  color: #B8D3EB;
-}
-
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #4ADE80;
-}
-
-/* ----------------------------------------------------
-   Right Authentication Form Panel (Clean White Card)
-   ---------------------------------------------------- */
-.auth-form-wrapper {
-  flex: 0.9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 32px;
-  background: var(--bg-page);
-}
-
-.form-container {
+.auth-card {
   width: 100%;
-  max-width: 440px;
-  background: #FFFFFF;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 32px;
+  max-width: 420px;
+  background-color: var(--surface, #FFFFFF);
+  border: 1px solid var(--border, #E1E5EA);
+  border-radius: var(--radius-md, 6px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 32px 28px;
+  box-sizing: border-box;
 }
 
-.form-header {
+/* ----------------------------------------------------
+   Brand Header: Icon & App Name
+   ---------------------------------------------------- */
+.brand-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 24px;
+  text-align: center;
 }
 
-.form-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.form-subtitle {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-/* Demo Role Buttons Grid */
-.demo-login-box {
-  background: #F8FAFC;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px;
-  margin-bottom: 24px;
-}
-
-.demo-title {
+.brand-logo-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm, 4px);
+  background-color: rgba(31, 78, 121, 0.08);
+  color: var(--primary, #1F4E79);
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  letter-spacing: 0.04em;
+  justify-content: center;
   margin-bottom: 10px;
 }
 
-.demo-title mat-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  color: var(--primary);
+.brand-logo-icon mat-icon {
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
 }
 
-.demo-buttons-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+.brand-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary, #1F2937);
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
-.demo-role-btn {
-  background: #FFFFFF;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xs);
-  padding: 8px 10px;
+/* ----------------------------------------------------
+   Tabs: Sign In / Sign Up
+   ---------------------------------------------------- */
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border, #E1E5EA);
+  margin-bottom: 20px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px 0;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary, #6B7280);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-align: center;
+}
+
+.auth-tab:hover {
+  color: var(--text-primary, #1F2937);
+}
+
+.auth-tab.active {
+  color: var(--primary, #1F4E79);
+  font-weight: 600;
+  border-bottom-color: var(--primary, #1F4E79);
+}
+
+/* ----------------------------------------------------
+   Feedback Banners
+   ---------------------------------------------------- */
+.feedback-banner {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 13px;
+  line-height: 1.4;
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  text-align: left;
-  height: auto;
+  margin-bottom: 16px;
+  box-sizing: border-box;
 }
 
-.demo-role-btn:hover {
-  background: var(--primary-subtle);
-  border-color: var(--primary-border);
+.feedback-banner.error {
+  background-color: var(--danger-bg, #FEF2F2);
+  border: 1px solid var(--danger-border, #FCA5A5);
+  color: var(--danger, #C62828);
 }
 
-.demo-btn-icon mat-icon {
+.feedback-banner.success {
+  background-color: var(--success-bg, #F0FDF4);
+  border: 1px solid var(--success-border, #86EFAC);
+  color: var(--success, #2E7D32);
+}
+
+.banner-icon {
   font-size: 18px;
   width: 18px;
   height: 18px;
-  color: var(--primary);
+  flex-shrink: 0;
 }
 
-.demo-btn-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.demo-btn-role {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.demo-btn-label {
-  font-size: 10px;
-  color: var(--text-muted);
-}
-
+/* ----------------------------------------------------
+   Form Layout: Consistent 16px spacing between fields
+   ---------------------------------------------------- */
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
 }
 
-.form-field label {
-  font-size: 12px;
+.field-label {
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-primary, #1F2937);
+  display: block;
 }
 
-.input-with-icon {
+/* Input container with prefix icon and suffix toggle */
+.input-container {
   position: relative;
+  width: 100%;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
 }
 
-.input-icon {
+.field-prefix-icon {
   position: absolute;
-  left: 10px;
+  left: 12px;
   font-size: 18px;
   width: 18px;
   height: 18px;
-  color: var(--text-muted);
+  color: var(--text-secondary, #6B7280);
   pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 }
 
-.input-with-icon input {
+.field-input {
   width: 100%;
-  height: 38px;
-  padding: 0 38px 0 34px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  height: 40px;
+  border: 1px solid var(--border, #E1E5EA);
+  border-radius: var(--radius-sm, 4px);
+  background-color: #FFFFFF;
+  font-size: 14px;
+  color: var(--text-primary, #1F2937);
+  padding: 0 14px 0 38px;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.field-input::placeholder {
+  color: #9CA3AF;
   font-size: 13px;
-  color: var(--text-primary);
-  background: #FFFFFF;
-  transition: border-color var(--transition-fast);
 }
 
-.input-with-icon input:focus {
-  border-color: var(--primary);
+.field-input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(31, 78, 121, 0.15);
+  border-color: var(--primary, #1F4E79);
+  box-shadow: 0 0 0 2px rgba(31, 78, 121, 0.12);
 }
 
-.toggle-pwd-btn {
+.field-input.with-suffix {
+  padding-right: 38px;
+}
+
+.field-suffix-btn {
   position: absolute;
-  right: 6px;
+  right: 8px;
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary, #6B7280);
+  border-radius: 4px;
+  height: 28px;
+  width: 28px;
+  transition: color 0.15s ease;
+}
+
+.field-suffix-btn:hover {
+  color: var(--text-primary, #1F2937);
+}
+
+.field-suffix-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.field-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* ----------------------------------------------------
+   Full Width Primary Submit Button
+   ---------------------------------------------------- */
+.auth-submit-btn {
+  width: 100%;
+  height: 40px;
+  background-color: var(--primary, #1F4E79);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
-  height: auto;
+  gap: 8px;
+  transition: background-color 0.15s ease-in-out;
+  margin-top: 4px;
 }
 
-.toggle-pwd-btn mat-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
+.auth-submit-btn:hover:not(:disabled) {
+  background-color: var(--primary-hover, #173B5C);
 }
 
-.error-banner {
-  background: var(--danger-bg);
-  border: 1px solid var(--danger-border);
-  color: var(--danger);
-  border-radius: var(--radius-xs);
-  padding: 8px 12px;
-  font-size: 12px;
+.auth-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btn-spinner {
+  display: inline-block;
+}
+
+/* ----------------------------------------------------
+   Developer Quick Login Helper (environment.production === false only)
+   ---------------------------------------------------- */
+.dev-quick-fill {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border, #E1E5EA);
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
-.error-banner mat-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
+.dev-label {
+  font-size: 11px;
+  color: var(--text-secondary, #6B7280);
+  font-weight: 500;
 }
 
-.btn-submit {
-  width: 100%;
-  height: 40px;
-  font-size: 13px;
-  font-weight: 600;
-  margin-top: 6px;
+.dev-links {
+  display: flex;
+  gap: 6px;
 }
 
-@media (max-width: 991px) {
-  .hero-showcase {
-    display: none;
-  }
+.dev-btn {
+  background: transparent;
+  border: 1px solid var(--border, #E1E5EA);
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--primary, #1F4E79);
+  padding: 3px 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
 
-  .auth-form-wrapper {
-    flex: 1;
-    padding: 24px 16px;
-  }
+.dev-btn:hover {
+  background-color: rgba(31, 78, 121, 0.08);
+  border-color: var(--primary, #1F4E79);
+}
 
-  .form-container {
-    max-width: 100%;
+/* ----------------------------------------------------
+   Responsive Adjustments
+   ---------------------------------------------------- */
+@media (max-width: 480px) {
+  .auth-card {
     padding: 24px 20px;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .auth-page-container {
+    padding: 16px 8px;
+    background-color: #FFFFFF;
   }
 }

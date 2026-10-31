@@ -26,3 +26,9 @@ export interface UserRequest {
   password?: string;
   role: 'ADMIN' | 'SALES' | 'PURCHASE' | 'ACCOUNTS' | string;
 }
+
+export interface RegisterRequest {
+  username: string;
+  password: string;
+  role: string;
+}

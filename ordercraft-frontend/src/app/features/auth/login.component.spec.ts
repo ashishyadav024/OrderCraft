@@ -9,7 +9,11 @@ import { LoginResponse } from '../../shared/models/auth.model';
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let authServiceMock: { isLoggedIn: ReturnType<typeof vi.fn>; login: ReturnType<typeof vi.fn> };
+  let authServiceMock: {
+    isLoggedIn: ReturnType<typeof vi.fn>;
+    login: ReturnType<typeof vi.fn>;
+    register: ReturnType<typeof vi.fn>;
+  };
   let routerMock: { navigate: ReturnType<typeof vi.fn>; navigateByUrl: ReturnType<typeof vi.fn> };
 
   const mockLoginResponse: LoginResponse = {
@@ -21,7 +25,8 @@ describe('LoginComponent', () => {
   beforeEach(async () => {
     authServiceMock = {
       isLoggedIn: vi.fn(),
-      login: vi.fn()
+      login: vi.fn(),
+      register: vi.fn()
     };
     routerMock = {
       navigate: vi.fn(),
@@ -170,5 +175,47 @@ describe('LoginComponent', () => {
 
     expect(component.isLoading).toBe(false);
     expect(component.errorMessage).toBe('Login failed. Please verify credentials.');
+  });
+
+  it('should switch tabs between signin and signup without reloading', () => {
+    authServiceMock.isLoggedIn.mockReturnValue(false);
+    createComponent();
+    fixture.detectChanges();
+
+    expect(component.activeTab).toBe('signin');
+    component.setTab('signup');
+    expect(component.activeTab).toBe('signup');
+    component.setTab('signin');
+    expect(component.activeTab).toBe('signin');
+  });
+
+  it('should show error when passwords do not match during sign up', () => {
+    authServiceMock.isLoggedIn.mockReturnValue(false);
+    createComponent();
+    fixture.detectChanges();
+
+    component.setTab('signup');
+    component.signupForm.setValue({
+      username: 'newuser',
+      password: 'Password123',
+      confirmPassword: 'MismatchPassword',
+      role: 'SALES'
+    });
+    component.onSignupSubmit();
+
+    expect(component.errorMessage).toBe('Passwords do not match.');
+    expect(authServiceMock.register).not.toHaveBeenCalled();
+  });
+
+  it('should quickLogin in dev mode and submit form', () => {
+    authServiceMock.isLoggedIn.mockReturnValue(false);
+    authServiceMock.login.mockReturnValue(of(mockLoginResponse));
+    createComponent();
+    fixture.detectChanges();
+
+    component.quickLogin('admin', 'Admin@123');
+
+    expect(component.loginForm.get('username')?.value).toBe('admin');
+    expect(authServiceMock.login).toHaveBeenCalled();
   });
 });

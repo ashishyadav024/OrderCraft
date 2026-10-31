@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { timeout } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -35,21 +36,34 @@ export class LoginComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
 
+  activeTab: 'signin' | 'signup' = 'signin';
+  isProduction = environment.production;
+
   loginForm = this.fb.nonNullable.group({
     username: ['', Validators.required],
     password: ['', Validators.required]
   });
 
+  signupForm = this.fb.nonNullable.group({
+    username: ['', [Validators.required, Validators.minLength(3)]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', Validators.required],
+    role: ['SALES', Validators.required]
+  });
+
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
   hidePassword = true;
+  hideSignupPassword = true;
+  hideSignupConfirmPassword = true;
   returnUrl = '/dashboard';
 
   demoRoles = [
-    { role: 'ADMIN', label: 'Administrator', user: 'admin', pass: 'Admin@123', icon: 'shield', color: '#6366f1' },
-    { role: 'SALES', label: 'Sales Specialist', user: 'sales', pass: 'Sales@123', icon: 'storefront', color: '#0ea5e9' },
-    { role: 'PURCHASE', label: 'Procurement Mgr', user: 'purchase', pass: 'Purchase@123', icon: 'shopping_cart', color: '#10b981' },
-    { role: 'ACCOUNTS', label: 'Accounts Officer', user: 'accounts', pass: 'Accounts@123', icon: 'account_balance', color: '#f59e0b' }
+    { role: 'ADMIN', label: 'Admin', user: 'admin', pass: 'Admin@123' },
+    { role: 'SALES', label: 'Sales', user: 'sales', pass: 'Sales@123' },
+    { role: 'PURCHASE', label: 'Purchase', user: 'purchase', pass: 'Purchase@123' },
+    { role: 'ACCOUNTS', label: 'Accounts', user: 'accounts', pass: 'Accounts@123' }
   ];
 
   ngOnInit(): void {
@@ -57,10 +71,23 @@ export class LoginComponent implements OnInit {
       this.router.navigate(['/dashboard']);
       return;
     }
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    this.returnUrl = this.route.snapshot?.queryParams?.['returnUrl'] || '/dashboard';
+    if (
+      this.route.snapshot?.queryParams?.['tab'] === 'signup' ||
+      this.route.snapshot?.routeConfig?.path === 'register'
+    ) {
+      this.activeTab = 'signup';
+    }
+  }
+
+  setTab(tab: 'signin' | 'signup'): void {
+    this.activeTab = tab;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   quickLogin(user: string, pass: string): void {
+    this.activeTab = 'signin';
     this.loginForm.setValue({
       username: user,
       password: pass
@@ -75,6 +102,7 @@ export class LoginComponent implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
+    this.successMessage = '';
 
     this.authService.login(this.loginForm.getRawValue()).pipe(
       timeout(5000)
@@ -97,6 +125,56 @@ export class LoginComponent implements OnInit {
             this.errorMessage = 'Server is currently unavailable. Please try again later.';
           } else {
             this.errorMessage = 'Login failed. Please verify credentials.';
+          }
+          this.cdr.detectChanges();
+        });
+      }
+    });
+  }
+
+  onSignupSubmit(): void {
+    if (this.signupForm.invalid) {
+      return;
+    }
+
+    const val = this.signupForm.getRawValue();
+    if (val.password !== val.confirmPassword) {
+      this.errorMessage = 'Passwords do not match.';
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.authService.register({
+      username: val.username.trim(),
+      password: val.password,
+      role: val.role
+    }).pipe(
+      timeout(5000)
+    ).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.isLoading = false;
+          this.successMessage = 'Account created successfully. Please sign in.';
+          this.loginForm.patchValue({ username: val.username.trim() });
+          this.signupForm.reset({ role: 'SALES' });
+          this.setTab('signin');
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        this.ngZone.run(() => {
+          this.isLoading = false;
+          if (err.status === 409) {
+            this.errorMessage = 'Username already exists. Please choose a different username.';
+          } else if (err.status === 404 || err.status === 405 || err.status === 403 || err.status === 401) {
+            this.errorMessage = 'User registration is managed by administrators. Please contact your admin or sign in.';
+          } else if (err.status === 0) {
+            this.errorMessage = 'Server is currently unavailable. Please try again later.';
+          } else {
+            this.errorMessage = err?.error?.message || 'Registration failed. Please try again.';
           }
           this.cdr.detectChanges();
         });

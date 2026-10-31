@@ -1,152 +1,87 @@
-<div class="login-page-container">
-  <!-- Left Hero Showcase Panel -->
-  <div class="hero-showcase">
-    <div class="hero-content">
-      <div class="brand-badge">
-        <mat-icon class="brand-icon">precision_manufacturing</mat-icon>
-        <div class="brand-title-wrap">
-          <span class="brand-name">OrderCraft</span>
-          <span class="brand-sub">Manufacturing Operations</span>
-        </div>
+<div class="auth-page-container">
+  <div class="auth-card">
+    <!-- Brand Logo & Name -->
+    <div class="brand-header">
+      <div class="brand-logo-icon">
+        <mat-icon>precision_manufacturing</mat-icon>
       </div>
-
-      <div class="hero-headline-block">
-        <h1 class="hero-title">Manufacturing Operations</h1>
-        <p class="hero-description">
-          Manage sales orders, bill of materials, inventory stock, procurement, and billing.
-        </p>
-      </div>
-
-      <div class="feature-pills-grid">
-        <div class="feature-card">
-          <div class="feature-icon-box blue">
-            <mat-icon>account_tree</mat-icon>
-          </div>
-          <div class="feature-text">
-            <h4>Bill of Materials</h4>
-            <p>Define component requirements for manufacturing.</p>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon-box green">
-            <mat-icon>local_shipping</mat-icon>
-          </div>
-          <div class="feature-text">
-            <h4>Purchase Orders</h4>
-            <p>Generate purchase orders for stock shortages.</p>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon-box amber">
-            <mat-icon>inventory</mat-icon>
-          </div>
-          <div class="feature-text">
-            <h4>Inventory Management</h4>
-            <p>Track raw material stock levels and goods receipt.</p>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon-box purple">
-            <mat-icon>receipt_long</mat-icon>
-          </div>
-          <div class="feature-text">
-            <h4>Invoices & Payments</h4>
-            <p>Generate customer invoices and record payments.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-footer-status">
-        <div class="status-indicator">
-          <span class="status-dot"></span>
-          <span>OrderCraft Enterprise</span>
-        </div>
-        <span class="version-label">v1.0.0</span>
-      </div>
+      <h1 class="brand-title">OrderCraft</h1>
     </div>
-  </div>
 
-  <!-- Right Authentication Form Panel -->
-  <div class="auth-form-wrapper">
-    <div class="form-container">
-      <div class="form-header">
-        <h2 class="form-title">Sign In</h2>
-        <p class="form-subtitle">Enter your credentials to access OrderCraft</p>
+    <!-- Tabs: Sign In / Sign Up -->
+    <div class="auth-tabs" role="tablist" aria-label="Authentication Options">
+      <button
+        type="button"
+        role="tab"
+        class="auth-tab"
+        [class.active]="activeTab === 'signin'"
+        [attr.aria-selected]="activeTab === 'signin'"
+        (click)="setTab('signin')"
+      >
+        Sign In
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="auth-tab"
+        [class.active]="activeTab === 'signup'"
+        [attr.aria-selected]="activeTab === 'signup'"
+        (click)="setTab('signup')"
+      >
+        Sign Up
+      </button>
+    </div>
+
+    <!-- Feedback Banners -->
+    @if (errorMessage) {
+      <div class="feedback-banner error">
+        <mat-icon class="banner-icon">warning</mat-icon>
+        <span>{{ errorMessage }}</span>
       </div>
-
-      <!-- Quick Demo Login Buttons -->
-      <div class="demo-login-box">
-        <div class="demo-title">
-          <mat-icon>bolt</mat-icon>
-          <span>Demo Accounts</span>
-        </div>
-        <div class="demo-buttons-grid">
-          @for (demo of demoRoles; track demo.role) {
-            <button
-              type="button"
-              class="demo-role-btn"
-              (click)="quickLogin(demo.user, demo.pass)"
-              [disabled]="isLoading"
-            >
-              <div class="demo-btn-icon" [style.color]="demo.color">
-                <mat-icon>{{ demo.icon }}</mat-icon>
-              </div>
-              <div class="demo-btn-text">
-                <span class="demo-btn-role">{{ demo.role }}</span>
-                <span class="demo-btn-label">{{ demo.label }}</span>
-              </div>
-            </button>
-          }
-        </div>
+    }
+    @if (successMessage) {
+      <div class="feedback-banner success">
+        <mat-icon class="banner-icon">check_circle</mat-icon>
+        <span>{{ successMessage }}</span>
       </div>
+    }
 
-      <div class="divider-with-text">
-        <span>OR SIGN IN WITH USERNAME</span>
-      </div>
-
-      @if (errorMessage) {
-        <div class="error-banner">
-          <mat-icon>warning</mat-icon>
-          <span>{{ errorMessage }}</span>
-        </div>
-      }
-
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-        <div class="form-group">
-          <label class="input-label" for="username-input">Username</label>
-          <div class="input-field-wrap">
-            <mat-icon class="field-icon">person</mat-icon>
+    <!-- Tab 1: Sign In -->
+    @if (activeTab === 'signin') {
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+        <div class="form-field">
+          <label class="field-label" for="signin-username">Username</label>
+          <div class="input-container">
+            <mat-icon class="field-prefix-icon">person</mat-icon>
             <input
-              id="username-input"
+              id="signin-username"
               type="text"
               formControlName="username"
-              placeholder="e.g. admin, sales, purchase, accounts"
-              class="custom-input"
+              placeholder="Enter username"
               autocomplete="username"
+              class="field-input"
             />
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="input-label" for="password-input">Password</label>
-          <div class="input-field-wrap">
-            <mat-icon class="field-icon">lock</mat-icon>
+        <div class="form-field">
+          <label class="field-label" for="signin-password">Password</label>
+          <div class="input-container">
+            <mat-icon class="field-prefix-icon">lock</mat-icon>
             <input
-              id="password-input"
+              id="signin-password"
               [type]="hidePassword ? 'password' : 'text'"
               formControlName="password"
               placeholder="Enter password"
-              class="custom-input"
               autocomplete="current-password"
+              class="field-input with-suffix"
             />
             <button
               type="button"
-              class="toggle-visibility-btn"
+              class="field-suffix-btn"
               (click)="hidePassword = !hidePassword"
               tabindex="-1"
+              aria-label="Toggle password visibility"
             >
               <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
@@ -155,23 +90,129 @@
 
         <button
           type="submit"
-          class="submit-button"
+          class="auth-submit-btn"
           [disabled]="loginForm.invalid || isLoading"
         >
           @if (isLoading) {
-            <mat-spinner diameter="20" class="spinner"></mat-spinner>
+            <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
             <span>Signing in...</span>
           } @else {
-            <mat-icon>login</mat-icon>
             <span>Sign In</span>
           }
         </button>
       </form>
+    }
 
-      <div class="security-notice">
-        <mat-icon>shield</mat-icon>
-        <span>Role-Based Access Control</span>
+    <!-- Tab 2: Sign Up -->
+    @if (activeTab === 'signup') {
+      <form [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()" class="auth-form" novalidate>
+        <div class="form-field">
+          <label class="field-label" for="signup-username">Username</label>
+          <div class="input-container">
+            <mat-icon class="field-prefix-icon">person</mat-icon>
+            <input
+              id="signup-username"
+              type="text"
+              formControlName="username"
+              placeholder="Choose a username"
+              autocomplete="username"
+              class="field-input"
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label" for="signup-password">Password</label>
+          <div class="input-container">
+            <mat-icon class="field-prefix-icon">lock</mat-icon>
+            <input
+              id="signup-password"
+              [type]="hideSignupPassword ? 'password' : 'text'"
+              formControlName="password"
+              placeholder="At least 6 characters"
+              autocomplete="new-password"
+              class="field-input with-suffix"
+            />
+            <button
+              type="button"
+              class="field-suffix-btn"
+              (click)="hideSignupPassword = !hideSignupPassword"
+              tabindex="-1"
+              aria-label="Toggle password visibility"
+            >
+              <mat-icon>{{ hideSignupPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label" for="signup-confirm-password">Confirm Password</label>
+          <div class="input-container">
+            <mat-icon class="field-prefix-icon">lock_outline</mat-icon>
+            <input
+              id="signup-confirm-password"
+              [type]="hideSignupConfirmPassword ? 'password' : 'text'"
+              formControlName="confirmPassword"
+              placeholder="Re-enter password"
+              autocomplete="new-password"
+              class="field-input with-suffix"
+            />
+            <button
+              type="button"
+              class="field-suffix-btn"
+              (click)="hideSignupConfirmPassword = !hideSignupConfirmPassword"
+              tabindex="-1"
+              aria-label="Toggle confirm password visibility"
+            >
+              <mat-icon>{{ hideSignupConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label" for="signup-role">Department / Role</label>
+          <div class="input-container">
+            <mat-icon class="field-prefix-icon">badge</mat-icon>
+            <select id="signup-role" formControlName="role" class="field-input field-select">
+              <option value="SALES">Sales</option>
+              <option value="PURCHASE">Purchase</option>
+              <option value="ACCOUNTS">Accounts</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="auth-submit-btn"
+          [disabled]="signupForm.invalid || isLoading"
+        >
+          @if (isLoading) {
+            <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
+            <span>Creating account...</span>
+          } @else {
+            <span>Sign Up</span>
+          }
+        </button>
+      </form>
+    }
+
+    <!-- Dev Quick Fill: ONLY when environment.production is false -->
+    @if (!isProduction) {
+      <div class="dev-quick-fill">
+        <span class="dev-label">Dev test login:</span>
+        <div class="dev-links">
+          @for (demo of demoRoles; track demo.role) {
+            <button
+              type="button"
+              class="dev-btn"
+              (click)="quickLogin(demo.user, demo.pass)"
+            >
+              {{ demo.label }}
+            </button>
+          }
+        </div>
       </div>
-    </div>
+    }
   </div>
 </div>
