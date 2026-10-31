@@ -40,18 +40,20 @@ export class LoginComponent implements OnInit {
   isProduction = environment.production;
 
   loginForm = this.fb.nonNullable.group({
-    username: ['', Validators.required],
-    password: ['', Validators.required]
+    username: ['', [Validators.required]],
+    password: ['', [Validators.required]]
   });
 
   signupForm = this.fb.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    confirmPassword: ['', Validators.required],
-    role: ['SALES', Validators.required]
+    confirmPassword: ['', [Validators.required]],
+    role: ['SALES', [Validators.required]]
   });
 
   isLoading = false;
+  isSubmitted = false;
+  isSignupSubmitted = false;
   errorMessage = '';
   successMessage = '';
   hidePassword = true;
@@ -84,6 +86,30 @@ export class LoginComponent implements OnInit {
     this.activeTab = tab;
     this.errorMessage = '';
     this.successMessage = '';
+    this.isSubmitted = false;
+    this.isSignupSubmitted = false;
+  }
+
+  togglePasswordVisibility(): void {
+    this.hidePassword = !this.hidePassword;
+  }
+
+  toggleSignupPasswordVisibility(): void {
+    this.hideSignupPassword = !this.hideSignupPassword;
+  }
+
+  toggleSignupConfirmPasswordVisibility(): void {
+    this.hideSignupConfirmPassword = !this.hideSignupConfirmPassword;
+  }
+
+  isFieldInvalid(fieldName: 'username' | 'password'): boolean {
+    const field = this.loginForm.get(fieldName);
+    return !!(field && field.invalid && (field.touched || field.dirty || this.isSubmitted));
+  }
+
+  isSignupFieldInvalid(fieldName: 'username' | 'password' | 'confirmPassword' | 'role'): boolean {
+    const field = this.signupForm.get(fieldName);
+    return !!(field && field.invalid && (field.touched || field.dirty || this.isSignupSubmitted));
   }
 
   quickLogin(user: string, pass: string): void {
@@ -96,7 +122,9 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
+    this.isSubmitted = true;
     if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       return;
     }
 
@@ -107,11 +135,14 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.loginForm.getRawValue()).pipe(
       timeout(5000)
     ).subscribe({
-      next: () => {
+      next: (response) => {
         this.ngZone.run(() => {
           this.isLoading = false;
           this.cdr.detectChanges();
-          this.router.navigateByUrl(this.returnUrl);
+          const target = (this.returnUrl && this.returnUrl !== '/login' && this.returnUrl !== '/register')
+            ? this.returnUrl
+            : '/dashboard';
+          this.router.navigateByUrl(target);
         });
       },
       error: (err) => {
@@ -133,7 +164,9 @@ export class LoginComponent implements OnInit {
   }
 
   onSignupSubmit(): void {
+    this.isSignupSubmitted = true;
     if (this.signupForm.invalid) {
+      this.signupForm.markAllAsTouched();
       return;
     }
 

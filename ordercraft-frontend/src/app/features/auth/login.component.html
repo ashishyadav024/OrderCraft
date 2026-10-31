@@ -1,6 +1,6 @@
 <div class="auth-page-container">
   <div class="auth-card">
-    <!-- Brand Logo & Name -->
+    <!-- Brand Logo & App Name -->
     <div class="brand-header">
       <div class="brand-logo-icon">
         <mat-icon>precision_manufacturing</mat-icon>
@@ -32,41 +32,51 @@
       </button>
     </div>
 
-    <!-- Feedback Banners -->
+    <!-- Feedback Banners Above Form -->
     @if (errorMessage) {
-      <div class="feedback-banner error">
+      <div class="feedback-banner error" role="alert" aria-live="assertive">
         <mat-icon class="banner-icon">warning</mat-icon>
-        <span>{{ errorMessage }}</span>
+        <span class="banner-text">{{ errorMessage }}</span>
       </div>
     }
     @if (successMessage) {
-      <div class="feedback-banner success">
+      <div class="feedback-banner success" role="status" aria-live="polite">
         <mat-icon class="banner-icon">check_circle</mat-icon>
-        <span>{{ successMessage }}</span>
+        <span class="banner-text">{{ successMessage }}</span>
       </div>
     }
 
     <!-- Tab 1: Sign In -->
     @if (activeTab === 'signin') {
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form" novalidate>
+        <!-- Username or Email Field -->
         <div class="form-field">
-          <label class="field-label" for="signin-username">Username</label>
-          <div class="input-container">
+          <label class="field-label" for="signin-username">Username or email</label>
+          <div class="input-container" [class.field-error]="isFieldInvalid('username')">
             <mat-icon class="field-prefix-icon">person</mat-icon>
             <input
               id="signin-username"
               type="text"
               formControlName="username"
-              placeholder="Enter username"
+              placeholder="Enter username or email"
               autocomplete="username"
               class="field-input"
+              [class.input-invalid]="isFieldInvalid('username')"
+              aria-describedby="username-error-msg"
             />
           </div>
+          @if (isFieldInvalid('username')) {
+            <div id="username-error-msg" class="inline-error-msg" role="alert">
+              <mat-icon class="inline-error-icon">error_outline</mat-icon>
+              <span>Username or email is required.</span>
+            </div>
+          }
         </div>
 
+        <!-- Password Field -->
         <div class="form-field">
           <label class="field-label" for="signin-password">Password</label>
-          <div class="input-container">
+          <div class="input-container" [class.field-error]="isFieldInvalid('password')">
             <mat-icon class="field-prefix-icon">lock</mat-icon>
             <input
               id="signin-password"
@@ -75,19 +85,29 @@
               placeholder="Enter password"
               autocomplete="current-password"
               class="field-input with-suffix"
+              [class.input-invalid]="isFieldInvalid('password')"
+              aria-describedby="password-error-msg"
             />
             <button
               type="button"
               class="field-suffix-btn"
-              (click)="hidePassword = !hidePassword"
+              (click)="togglePasswordVisibility()"
               tabindex="-1"
-              aria-label="Toggle password visibility"
+              [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+              [title]="hidePassword ? 'Show password' : 'Hide password'"
             >
               <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </div>
+          @if (isFieldInvalid('password')) {
+            <div id="password-error-msg" class="inline-error-msg" role="alert">
+              <mat-icon class="inline-error-icon">error_outline</mat-icon>
+              <span>Password is required.</span>
+            </div>
+          }
         </div>
 
+        <!-- Submit Button with Spinner & Disabled State -->
         <button
           type="submit"
           class="auth-submit-btn"
@@ -106,9 +126,10 @@
     <!-- Tab 2: Sign Up -->
     @if (activeTab === 'signup') {
       <form [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()" class="auth-form" novalidate>
+        <!-- Signup Username -->
         <div class="form-field">
           <label class="field-label" for="signup-username">Username</label>
-          <div class="input-container">
+          <div class="input-container" [class.field-error]="isSignupFieldInvalid('username')">
             <mat-icon class="field-prefix-icon">person</mat-icon>
             <input
               id="signup-username"
@@ -117,13 +138,22 @@
               placeholder="Choose a username"
               autocomplete="username"
               class="field-input"
+              [class.input-invalid]="isSignupFieldInvalid('username')"
+              aria-describedby="signup-username-error"
             />
           </div>
+          @if (isSignupFieldInvalid('username')) {
+            <div id="signup-username-error" class="inline-error-msg" role="alert">
+              <mat-icon class="inline-error-icon">error_outline</mat-icon>
+              <span>Username is required (at least 3 characters).</span>
+            </div>
+          }
         </div>
 
+        <!-- Signup Password -->
         <div class="form-field">
           <label class="field-label" for="signup-password">Password</label>
-          <div class="input-container">
+          <div class="input-container" [class.field-error]="isSignupFieldInvalid('password')">
             <mat-icon class="field-prefix-icon">lock</mat-icon>
             <input
               id="signup-password"
@@ -132,22 +162,32 @@
               placeholder="At least 6 characters"
               autocomplete="new-password"
               class="field-input with-suffix"
+              [class.input-invalid]="isSignupFieldInvalid('password')"
+              aria-describedby="signup-password-error"
             />
             <button
               type="button"
               class="field-suffix-btn"
-              (click)="hideSignupPassword = !hideSignupPassword"
+              (click)="toggleSignupPasswordVisibility()"
               tabindex="-1"
-              aria-label="Toggle password visibility"
+              [attr.aria-label]="hideSignupPassword ? 'Show password' : 'Hide password'"
+              [title]="hideSignupPassword ? 'Show password' : 'Hide password'"
             >
               <mat-icon>{{ hideSignupPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </div>
+          @if (isSignupFieldInvalid('password')) {
+            <div id="signup-password-error" class="inline-error-msg" role="alert">
+              <mat-icon class="inline-error-icon">error_outline</mat-icon>
+              <span>Password is required (minimum 6 characters).</span>
+            </div>
+          }
         </div>
 
+        <!-- Signup Confirm Password -->
         <div class="form-field">
           <label class="field-label" for="signup-confirm-password">Confirm Password</label>
-          <div class="input-container">
+          <div class="input-container" [class.field-error]="isSignupFieldInvalid('confirmPassword')">
             <mat-icon class="field-prefix-icon">lock_outline</mat-icon>
             <input
               id="signup-confirm-password"
@@ -156,19 +196,29 @@
               placeholder="Re-enter password"
               autocomplete="new-password"
               class="field-input with-suffix"
+              [class.input-invalid]="isSignupFieldInvalid('confirmPassword')"
+              aria-describedby="signup-confirm-error"
             />
             <button
               type="button"
               class="field-suffix-btn"
-              (click)="hideSignupConfirmPassword = !hideSignupConfirmPassword"
+              (click)="toggleSignupConfirmPasswordVisibility()"
               tabindex="-1"
-              aria-label="Toggle confirm password visibility"
+              [attr.aria-label]="hideSignupConfirmPassword ? 'Show password' : 'Hide password'"
+              [title]="hideSignupConfirmPassword ? 'Show password' : 'Hide password'"
             >
               <mat-icon>{{ hideSignupConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
           </div>
+          @if (isSignupFieldInvalid('confirmPassword')) {
+            <div id="signup-confirm-error" class="inline-error-msg" role="alert">
+              <mat-icon class="inline-error-icon">error_outline</mat-icon>
+              <span>Please confirm your password.</span>
+            </div>
+          }
         </div>
 
+        <!-- Signup Department/Role -->
         <div class="form-field">
           <label class="field-label" for="signup-role">Department / Role</label>
           <div class="input-container">

@@ -103,15 +103,19 @@ describe('LoginComponent', () => {
     expect(component.loginForm.valid).toBe(true);
   });
 
-  it('should not call authService.login if form is submitted while invalid', () => {
+  it('should trigger inline validation flags when form is submitted while invalid', () => {
     authServiceMock.isLoggedIn.mockReturnValue(false);
     createComponent();
     fixture.detectChanges();
 
-    component.loginForm.controls['username'].setValue('');
-    component.loginForm.controls['password'].setValue('');
+    expect(component.isFieldInvalid('username')).toBe(false);
+    expect(component.isFieldInvalid('password')).toBe(false);
+
     component.onSubmit();
 
+    expect(component.isSubmitted).toBe(true);
+    expect(component.isFieldInvalid('username')).toBe(true);
+    expect(component.isFieldInvalid('password')).toBe(true);
     expect(authServiceMock.login).not.toHaveBeenCalled();
   });
 
@@ -175,6 +179,18 @@ describe('LoginComponent', () => {
 
     expect(component.isLoading).toBe(false);
     expect(component.errorMessage).toBe('Login failed. Please verify credentials.');
+  });
+
+  it('should toggle password visibility on demand', () => {
+    authServiceMock.isLoggedIn.mockReturnValue(false);
+    createComponent();
+    fixture.detectChanges();
+
+    expect(component.hidePassword).toBe(true);
+    component.togglePasswordVisibility();
+    expect(component.hidePassword).toBe(false);
+    component.togglePasswordVisibility();
+    expect(component.hidePassword).toBe(true);
   });
 
   it('should switch tabs between signin and signup without reloading', () => {
