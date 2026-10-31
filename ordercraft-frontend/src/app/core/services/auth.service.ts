@@ -3,7 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { LoginRequest, LoginResponse, UserSession, RegisterRequest } from '../../shared/models/auth.model';
+import { LoginRequest, LoginResponse, UserSession, RegisterRequest, RegisterResponse } from '../../shared/models/auth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,8 +31,8 @@ export class AuthService {
     );
   }
 
-  register(userData: RegisterRequest): Observable<any> {
-    return this.http.post<any>(`${this.API_URL}/register`, userData);
+  register(userData: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.API_URL}/register`, userData);
   }
 
   logout(): void {

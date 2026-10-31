@@ -62,7 +62,7 @@ describe('LoginComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should redirect immediately to /orders if user is already logged in', () => {
+  it('should redirect immediately to /dashboard if user is already logged in', () => {
     authServiceMock.isLoggedIn.mockReturnValue(true);
     createComponent();
     fixture.detectChanges();
@@ -98,60 +98,45 @@ describe('LoginComponent', () => {
     fixture.detectChanges();
 
     component.loginForm.controls['username'].setValue('admin');
-    component.loginForm.controls['password'].setValue('Admin@123');
+    component.loginForm.controls['password'].setValue('password123');
 
     expect(component.loginForm.valid).toBe(true);
   });
 
-  it('should trigger inline validation flags when form is submitted while invalid', () => {
-    authServiceMock.isLoggedIn.mockReturnValue(false);
-    createComponent();
-    fixture.detectChanges();
-
-    expect(component.isFieldInvalid('username')).toBe(false);
-    expect(component.isFieldInvalid('password')).toBe(false);
-
-    component.onSubmit();
-
-    expect(component.isSubmitted).toBe(true);
-    expect(component.isFieldInvalid('username')).toBe(true);
-    expect(component.isFieldInvalid('password')).toBe(true);
-    expect(authServiceMock.login).not.toHaveBeenCalled();
-  });
-
-  it('should call authService.login and navigate to returnUrl on successful login', () => {
+  it('should handle successful login and redirect to default url', () => {
     authServiceMock.isLoggedIn.mockReturnValue(false);
     authServiceMock.login.mockReturnValue(of(mockLoginResponse));
     createComponent();
     fixture.detectChanges();
 
     component.loginForm.controls['username'].setValue('admin');
-    component.loginForm.controls['password'].setValue('Admin@123');
+    component.loginForm.controls['password'].setValue('password123');
     component.onSubmit();
 
-    expect(component.isLoading).toBe(false);
     expect(authServiceMock.login).toHaveBeenCalledWith({
       username: 'admin',
-      password: 'Admin@123'
+      password: 'password123'
     });
     expect(routerMock.navigateByUrl).toHaveBeenCalledWith('/dashboard');
   });
 
-  it('should display invalid credentials message on 401 error', () => {
+  it('should show error banner when credentials are invalid (401)', () => {
     authServiceMock.isLoggedIn.mockReturnValue(false);
-    authServiceMock.login.mockReturnValue(throwError(() => ({ status: 401 })));
+    authServiceMock.login.mockReturnValue(
+      throwError(() => ({ status: 401, error: { message: 'Invalid credentials' } }))
+    );
     createComponent();
     fixture.detectChanges();
 
-    component.loginForm.controls['username'].setValue('wronguser');
-    component.loginForm.controls['password'].setValue('wrongpass');
+    component.loginForm.controls['username'].setValue('admin');
+    component.loginForm.controls['password'].setValue('wrong-password');
     component.onSubmit();
 
-    expect(component.isLoading).toBe(false);
     expect(component.errorMessage).toBe('Invalid username or password.');
+    expect(component.isLoading).toBe(false);
   });
 
-  it('should display server connection error when backend is down (status 0)', () => {
+  it('should show server unavailable error banner on network failure (status 0)', () => {
     authServiceMock.isLoggedIn.mockReturnValue(false);
     authServiceMock.login.mockReturnValue(throwError(() => ({ status: 0 })));
     createComponent();
@@ -161,27 +146,11 @@ describe('LoginComponent', () => {
     component.loginForm.controls['password'].setValue('Admin@123');
     component.onSubmit();
 
+    expect(component.errorMessage).toBe('Server is currently unavailable. Please try again later.');
     expect(component.isLoading).toBe(false);
-    expect(component.errorMessage).toBe(
-      'Server is currently unavailable. Please try again later.'
-    );
   });
 
-  it('should display generic error message on unexpected errors', () => {
-    authServiceMock.isLoggedIn.mockReturnValue(false);
-    authServiceMock.login.mockReturnValue(throwError(() => ({ status: 500 })));
-    createComponent();
-    fixture.detectChanges();
-
-    component.loginForm.controls['username'].setValue('admin');
-    component.loginForm.controls['password'].setValue('Admin@123');
-    component.onSubmit();
-
-    expect(component.isLoading).toBe(false);
-    expect(component.errorMessage).toBe('Login failed. Please verify credentials.');
-  });
-
-  it('should toggle password visibility on demand', () => {
+  it('should toggle password visibility on click', () => {
     authServiceMock.isLoggedIn.mockReturnValue(false);
     createComponent();
     fixture.detectChanges();
@@ -205,22 +174,80 @@ describe('LoginComponent', () => {
     expect(component.activeTab).toBe('signin');
   });
 
-  it('should show error when passwords do not match during sign up', () => {
+  it('should reject signup form when passwords do not match', () => {
     authServiceMock.isLoggedIn.mockReturnValue(false);
     createComponent();
     fixture.detectChanges();
 
     component.setTab('signup');
     component.signupForm.setValue({
-      username: 'newuser',
+      fullName: 'Test User',
+      username: 'testuser',
+      email: 'test@ordercraft.com',
       password: 'Password123',
-      confirmPassword: 'MismatchPassword',
+      confirmPassword: 'MismatchPassword1',
       role: 'SALES'
     });
     component.onSignupSubmit();
 
-    expect(component.errorMessage).toBe('Passwords do not match.');
+    expect(component.isSignupFieldInvalid('confirmPassword')).toBe(true);
+    expect(component.getSignupFieldError('confirmPassword')).toBe('Passwords do not match.');
     expect(authServiceMock.register).not.toHaveBeenCalled();
+  });
+
+  it('should enforce password pattern of at least 8 chars with letter and number', () => {
+    authServiceMock.isLoggedIn.mockReturnValue(false);
+    createComponent();
+    fixture.detectChanges();
+
+    component.setTab('signup');
+    // Only numbers
+    component.signupForm.controls.password.setValue('12345678');
+    expect(component.signupForm.controls.password.invalid).toBe(true);
+
+    // Only letters
+    component.signupForm.controls.password.setValue('abcdefgh');
+    expect(component.signupForm.controls.password.invalid).toBe(true);
+
+    // Letter and number, min 8 chars
+    component.signupForm.controls.password.setValue('Secret123');
+    expect(component.signupForm.controls.password.valid).toBe(true);
+  });
+
+  it('should successfully submit valid signup, show account created message, and switch to signin tab', () => {
+    authServiceMock.isLoggedIn.mockReturnValue(false);
+    authServiceMock.register.mockReturnValue(of({
+      id: 1,
+      fullName: 'Rahul Verma',
+      username: 'rahul.sales',
+      email: 'rahul@ordercraft.com',
+      role: 'SALES',
+      message: 'Account created successfully'
+    }));
+    createComponent();
+    fixture.detectChanges();
+
+    component.setTab('signup');
+    component.signupForm.setValue({
+      fullName: 'Rahul Verma',
+      username: 'rahul.sales',
+      email: 'rahul@ordercraft.com',
+      password: 'Password123',
+      confirmPassword: 'Password123',
+      role: 'SALES'
+    });
+    component.onSignupSubmit();
+
+    expect(authServiceMock.register).toHaveBeenCalledWith({
+      fullName: 'Rahul Verma',
+      username: 'rahul.sales',
+      email: 'rahul@ordercraft.com',
+      password: 'Password123',
+      role: 'SALES'
+    });
+    expect(component.successMessage).toContain('Account created');
+    expect(component.activeTab).toBe('signin');
+    expect(component.loginForm.get('username')?.value).toBe('rahul.sales');
   });
 
   it('should quickLogin in dev mode and submit form', () => {

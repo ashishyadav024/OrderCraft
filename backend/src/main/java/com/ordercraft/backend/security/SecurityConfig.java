@@ -61,7 +61,8 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authorizeHttpRequests(auth -> auth
                         // RULES ARE CHECKED TOP TO BOTTOM: the first match wins.
-                        .requestMatchers("/api/auth/login").permitAll()
+                        // Public auth endpoints: /api/auth/login, /api/auth/register
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")

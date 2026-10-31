@@ -69,18 +69,20 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedUsers() {
         if (userRepository.count() == 0) {
-            createUser(adminUsername, adminPassword, Role.ADMIN);
-            createUser("sales", "Sales@123", Role.SALES);
-            createUser("purchase", "Purchase@123", Role.PURCHASE);
-            createUser("accounts", "Accounts@123", Role.ACCOUNTS);
+            createUser(adminUsername, adminPassword, Role.ADMIN, "System Administrator", "admin@ordercraft.com");
+            createUser("sales", "Sales@123", Role.SALES, "Sales Specialist", "sales@ordercraft.com");
+            createUser("purchase", "Purchase@123", Role.PURCHASE, "Procurement Manager", "purchase@ordercraft.com");
+            createUser("accounts", "Accounts@123", Role.ACCOUNTS, "Accounts Officer", "accounts@ordercraft.com");
             System.out.println("Default users (admin, sales, purchase, accounts) initialized.");
         }
     }
 
-    private void createUser(String username, String password, Role role) {
+    private void createUser(String username, String password, Role role, String fullName, String email) {
         if (userRepository.findByUsername(username).isEmpty()) {
             AppUser user = new AppUser();
+            user.setFullName(fullName);
             user.setUsername(username);
+            user.setEmail(email);
             user.setPasswordHash(passwordEncoder.encode(password));
             user.setRole(role);
             user.setEnabled(true);

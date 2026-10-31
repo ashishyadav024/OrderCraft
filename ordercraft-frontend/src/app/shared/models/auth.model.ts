@@ -28,7 +28,19 @@ export interface UserRequest {
 }
 
 export interface RegisterRequest {
+  fullName: string;
   username: string;
+  email: string;
   password: string;
+  confirmPassword?: string;
+  role: 'SALES' | 'PURCHASE' | 'ACCOUNTS' | string;
+}
+
+export interface RegisterResponse {
+  id: number;
+  fullName: string;
+  username: string;
+  email: string;
   role: string;
+  message: string;
 }

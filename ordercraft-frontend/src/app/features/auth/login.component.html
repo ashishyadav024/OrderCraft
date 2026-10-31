@@ -62,11 +62,11 @@
               autocomplete="username"
               class="field-input"
               [class.input-invalid]="isFieldInvalid('username')"
-              aria-describedby="username-error-msg"
+              aria-describedby="signin-username-error"
             />
           </div>
           @if (isFieldInvalid('username')) {
-            <div id="username-error-msg" class="inline-error-msg" role="alert">
+            <div id="signin-username-error" class="inline-error-msg" role="alert">
               <mat-icon class="inline-error-icon">error_outline</mat-icon>
               <span>Username or email is required.</span>
             </div>
@@ -86,7 +86,7 @@
               autocomplete="current-password"
               class="field-input with-suffix"
               [class.input-invalid]="isFieldInvalid('password')"
-              aria-describedby="password-error-msg"
+              aria-describedby="signin-password-error"
             />
             <button
               type="button"
@@ -100,14 +100,14 @@
             </button>
           </div>
           @if (isFieldInvalid('password')) {
-            <div id="password-error-msg" class="inline-error-msg" role="alert">
+            <div id="signin-password-error" class="inline-error-msg" role="alert">
               <mat-icon class="inline-error-icon">error_outline</mat-icon>
               <span>Password is required.</span>
             </div>
           }
         </div>
 
-        <!-- Submit Button with Spinner & Disabled State -->
+        <!-- Sign In Submit Button -->
         <button
           type="submit"
           class="auth-submit-btn"
@@ -126,7 +126,31 @@
     <!-- Tab 2: Sign Up -->
     @if (activeTab === 'signup') {
       <form [formGroup]="signupForm" (ngSubmit)="onSignupSubmit()" class="auth-form" novalidate>
-        <!-- Signup Username -->
+        <!-- Full Name Field -->
+        <div class="form-field">
+          <label class="field-label" for="signup-fullname">Full Name</label>
+          <div class="input-container" [class.field-error]="isSignupFieldInvalid('fullName')">
+            <mat-icon class="field-prefix-icon">badge</mat-icon>
+            <input
+              id="signup-fullname"
+              type="text"
+              formControlName="fullName"
+              placeholder="e.g. Ananya Sharma"
+              autocomplete="name"
+              class="field-input"
+              [class.input-invalid]="isSignupFieldInvalid('fullName')"
+              aria-describedby="signup-fullname-error"
+            />
+          </div>
+          @if (isSignupFieldInvalid('fullName')) {
+            <div id="signup-fullname-error" class="inline-error-msg" role="alert">
+              <mat-icon class="inline-error-icon">error_outline</mat-icon>
+              <span>{{ getSignupFieldError('fullName') }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Username Field -->
         <div class="form-field">
           <label class="field-label" for="signup-username">Username</label>
           <div class="input-container" [class.field-error]="isSignupFieldInvalid('username')">
@@ -135,7 +159,7 @@
               id="signup-username"
               type="text"
               formControlName="username"
-              placeholder="Choose a username"
+              placeholder="e.g. ananya.sales"
               autocomplete="username"
               class="field-input"
               [class.input-invalid]="isSignupFieldInvalid('username')"
@@ -145,7 +169,31 @@
           @if (isSignupFieldInvalid('username')) {
             <div id="signup-username-error" class="inline-error-msg" role="alert">
               <mat-icon class="inline-error-icon">error_outline</mat-icon>
-              <span>Username is required (at least 3 characters).</span>
+              <span>{{ getSignupFieldError('username') }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-field">
+          <label class="field-label" for="signup-email">Email</label>
+          <div class="input-container" [class.field-error]="isSignupFieldInvalid('email')">
+            <mat-icon class="field-prefix-icon">email</mat-icon>
+            <input
+              id="signup-email"
+              type="email"
+              formControlName="email"
+              placeholder="e.g. ananya@company.com"
+              autocomplete="email"
+              class="field-input"
+              [class.input-invalid]="isSignupFieldInvalid('email')"
+              aria-describedby="signup-email-error"
+            />
+          </div>
+          @if (isSignupFieldInvalid('email')) {
+            <div id="signup-email-error" class="inline-error-msg" role="alert">
+              <mat-icon class="inline-error-icon">error_outline</mat-icon>
+              <span>{{ getSignupFieldError('email') }}</span>
             </div>
           }
         </div>
@@ -159,7 +207,7 @@
               id="signup-password"
               [type]="hideSignupPassword ? 'password' : 'text'"
               formControlName="password"
-              placeholder="At least 6 characters"
+              placeholder="Min 8 chars, 1 letter and 1 number"
               autocomplete="new-password"
               class="field-input with-suffix"
               [class.input-invalid]="isSignupFieldInvalid('password')"
@@ -179,7 +227,7 @@
           @if (isSignupFieldInvalid('password')) {
             <div id="signup-password-error" class="inline-error-msg" role="alert">
               <mat-icon class="inline-error-icon">error_outline</mat-icon>
-              <span>Password is required (minimum 6 characters).</span>
+              <span>{{ getSignupFieldError('password') }}</span>
             </div>
           }
         </div>
@@ -193,7 +241,7 @@
               id="signup-confirm-password"
               [type]="hideSignupConfirmPassword ? 'password' : 'text'"
               formControlName="confirmPassword"
-              placeholder="Re-enter password"
+              placeholder="Re-enter your password"
               autocomplete="new-password"
               class="field-input with-suffix"
               [class.input-invalid]="isSignupFieldInvalid('confirmPassword')"
@@ -213,25 +261,31 @@
           @if (isSignupFieldInvalid('confirmPassword')) {
             <div id="signup-confirm-error" class="inline-error-msg" role="alert">
               <mat-icon class="inline-error-icon">error_outline</mat-icon>
-              <span>Please confirm your password.</span>
+              <span>{{ getSignupFieldError('confirmPassword') }}</span>
             </div>
           }
         </div>
 
-        <!-- Signup Department/Role -->
+        <!-- Signup Department/Role (No ADMIN) -->
         <div class="form-field">
-          <label class="field-label" for="signup-role">Department / Role</label>
-          <div class="input-container">
-            <mat-icon class="field-prefix-icon">badge</mat-icon>
+          <label class="field-label" for="signup-role">Role</label>
+          <div class="input-container" [class.field-error]="isSignupFieldInvalid('role')">
+            <mat-icon class="field-prefix-icon">work_outline</mat-icon>
             <select id="signup-role" formControlName="role" class="field-input field-select">
-              <option value="SALES">Sales</option>
-              <option value="PURCHASE">Purchase</option>
-              <option value="ACCOUNTS">Accounts</option>
-              <option value="ADMIN">Admin</option>
+              @for (r of signupRoles; track r.value) {
+                <option [value]="r.value">{{ r.label }}</option>
+              }
             </select>
           </div>
+          @if (isSignupFieldInvalid('role')) {
+            <div id="signup-role-error" class="inline-error-msg" role="alert">
+              <mat-icon class="inline-error-icon">error_outline</mat-icon>
+              <span>{{ getSignupFieldError('role') }}</span>
+            </div>
+          }
         </div>
 
+        <!-- Submit Button -->
         <button
           type="submit"
           class="auth-submit-btn"
