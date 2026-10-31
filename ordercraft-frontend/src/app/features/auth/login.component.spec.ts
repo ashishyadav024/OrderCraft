@@ -154,7 +154,7 @@ describe('LoginComponent', () => {
 
     expect(component.isLoading).toBe(false);
     expect(component.errorMessage).toBe(
-      'Backend server unavailable. Connecting with OrderCraft In-Memory Session.'
+      'Server is currently unavailable. Please try again later.'
     );
   });
 

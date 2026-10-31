@@ -20,7 +20,6 @@
         </div>
         <div class="brand-text">
           <span class="brand-title">OrderCraft</span>
-          <span class="brand-subtitle">Manufacturing OMS</span>
         </div>
       </a>
     </div>
@@ -57,14 +56,14 @@
           <mat-icon>assignment</mat-icon>
           <div class="menu-item-content">
             <span class="menu-item-title">Sales Orders</span>
-            <span class="menu-item-desc">Create, confirm and track customer orders</span>
+            <span class="menu-item-desc">Customer orders and fulfillment</span>
           </div>
         </a>
         <a mat-menu-item routerLink="/customers">
           <mat-icon>people</mat-icon>
           <div class="menu-item-content">
             <span class="menu-item-title">Customers</span>
-            <span class="menu-item-desc">Client companies and contact profiles</span>
+            <span class="menu-item-desc">Customer directory</span>
           </div>
         </a>
       </mat-menu>
@@ -87,14 +86,14 @@
           <mat-icon>inventory_2</mat-icon>
           <div class="menu-item-content">
             <span class="menu-item-title">Products & BOM</span>
-            <span class="menu-item-desc">Finished goods, assemblies & bill-of-materials</span>
+            <span class="menu-item-desc">Products and bill of materials</span>
           </div>
         </a>
         <a mat-menu-item routerLink="/materials">
           <mat-icon>layers</mat-icon>
           <div class="menu-item-content">
-            <span class="menu-item-title">Raw Materials</span>
-            <span class="menu-item-desc">Inventory stock, unit costs & valuations</span>
+            <span class="menu-item-title">Materials</span>
+            <span class="menu-item-desc">Raw materials and stock levels</span>
           </div>
         </a>
       </mat-menu>
@@ -117,14 +116,14 @@
           <mat-icon>local_shipping</mat-icon>
           <div class="menu-item-content">
             <span class="menu-item-title">Purchase Orders</span>
-            <span class="menu-item-desc">Procure materials and receive inventory</span>
+            <span class="menu-item-desc">Purchase orders and goods receipt</span>
           </div>
         </a>
         <a mat-menu-item routerLink="/suppliers">
           <mat-icon>business</mat-icon>
           <div class="menu-item-content">
             <span class="menu-item-title">Suppliers</span>
-            <span class="menu-item-desc">Vendor database and contact registry</span>
+            <span class="menu-item-desc">Supplier directory</span>
           </div>
         </a>
       </mat-menu>
@@ -157,16 +156,16 @@
         <a mat-menu-item routerLink="/dashboard">
           <mat-icon>insights</mat-icon>
           <div class="menu-item-content">
-            <span class="menu-item-title">Operations Telemetry</span>
-            <span class="menu-item-desc">KPI metrics, pipeline values & stock alerts</span>
+            <span class="menu-item-title">Dashboard</span>
+            <span class="menu-item-desc">Overview and metrics</span>
           </div>
         </a>
         @if (canAccess(['ADMIN'])) {
           <a mat-menu-item routerLink="/users">
             <mat-icon>manage_accounts</mat-icon>
             <div class="menu-item-content">
-              <span class="menu-item-title">User Administration</span>
-              <span class="menu-item-desc">Manage accounts, operator roles & security</span>
+              <span class="menu-item-title">Users</span>
+              <span class="menu-item-desc">User accounts and permissions</span>
             </div>
           </a>
         }
@@ -204,13 +203,13 @@
           </div>
           <div class="user-details">
             <span class="user-fullname">{{ user.username }}</span>
-            <span class="user-role-tag" [ngClass]="user.role">{{ user.role }} PROFILE</span>
+            <span class="user-role-tag" [ngClass]="user.role">{{ user.role }}</span>
           </div>
         </div>
 
         <mat-divider></mat-divider>
 
-        <div class="menu-section-title">Switch Role for Testing:</div>
+        <div class="menu-section-title">Switch Role:</div>
         @for (r of availableRoles; track r) {
           <button mat-menu-item (click)="onSwitchRole(r)" [class.active-role-item]="r === user.role">
             <mat-icon>{{ getRoleIcon(r) }}</mat-icon>
@@ -259,7 +258,6 @@
       </div>
       <div class="brand-text">
         <span class="brand-title">OrderCraft</span>
-        <span class="brand-subtitle">Manufacturing OMS</span>
       </div>
     </div>
     <button
@@ -279,7 +277,7 @@
     </div>
     <div class="drawer-user-info">
       <span class="drawer-username">{{ user.username }}</span>
-      <span class="drawer-role-badge" [ngClass]="user.role">{{ user.role }} Profile</span>
+      <span class="drawer-role-badge" [ngClass]="user.role">{{ user.role }}</span>
     </div>
   </div>
 
@@ -313,7 +311,7 @@
       </a>
       <a routerLink="/materials" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
         <mat-icon>layers</mat-icon>
-        <span>Raw Materials</span>
+        <span>Materials</span>
       </a>
     </div>
 
@@ -341,13 +339,13 @@
       <span class="drawer-section-title">Administration</span>
       <a routerLink="/users" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
         <mat-icon>manage_accounts</mat-icon>
-        <span>User Administration</span>
+        <span>Users</span>
       </a>
     </div>
 
     <!-- Quick Role Switcher in Mobile Drawer -->
     <div class="drawer-nav-section" *ngIf="user$ | async as user">
-      <span class="drawer-section-title">Switch Role Profile</span>
+      <span class="drawer-section-title">Switch Role</span>
       <div class="drawer-role-grid">
         @for (r of availableRoles; track r) {
           <button

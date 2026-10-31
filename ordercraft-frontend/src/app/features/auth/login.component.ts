@@ -90,11 +90,11 @@ export class LoginComponent implements OnInit {
         this.ngZone.run(() => {
           this.isLoading = false;
           if (err.name === 'TimeoutError') {
-            this.errorMessage = 'Login timed out. Check backend connection on port 8085.';
+            this.errorMessage = 'Login timed out. Please try again.';
           } else if (err.status === 401) {
             this.errorMessage = 'Invalid username or password.';
           } else if (err.status === 0) {
-            this.errorMessage = 'Backend server unavailable. Please ensure Spring Boot is running on port 8085.';
+            this.errorMessage = 'Server is currently unavailable. Please try again later.';
           } else {
             this.errorMessage = 'Login failed. Please verify credentials.';
           }

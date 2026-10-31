@@ -79,7 +79,7 @@ export class MaterialListComponent implements OnInit {
         this.ngZone.run(() => { this.materials = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.errorMessage = 'Failed to load materials inventory. Check backend connection.';
+        this.errorMessage = 'Failed to load materials. Please check connection and retry.';
         this.isLoading = false;
         this.cdr.detectChanges();
       }

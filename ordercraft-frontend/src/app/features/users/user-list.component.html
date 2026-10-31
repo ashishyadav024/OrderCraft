@@ -4,14 +4,14 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-titles">
-      <div class="breadcrumb">Manufacturing / Security & Administration</div>
-      <h2>System User Administration</h2>
-      <p>Configure role-based access control (RBAC), user accounts, and authentication authorizations</p>
+      <div class="breadcrumb">Administration</div>
+      <h2>Users</h2>
+      <p>Manage user accounts, roles, and access.</p>
     </div>
     <div class="header-actions">
       <button class="oc-btn-primary" (click)="openCreateModal()">
         <mat-icon>person_add</mat-icon>
-        <span>Add User Account</span>
+        <span>New User</span>
       </button>
     </div>
   </div>
@@ -41,13 +41,13 @@
   @if (isLoading) {
     <div class="state-container">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading security accounts...</p>
+      <p>Loading users...</p>
     </div>
   } @else if (errorMessage) {
     <div class="state-container error">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button class="oc-btn-secondary" (click)="fetchUsers()">Retry Connection</button>
+      <button class="oc-btn-secondary" (click)="fetchUsers()">Retry</button>
     </div>
   } @else {
     <div class="oc-table-container">
@@ -55,9 +55,9 @@
         <thead>
           <tr>
             <th>Username</th>
-            <th>Assigned Security Role</th>
-            <th>Account Status</th>
-            <th class="text-right">Access Toggle</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="text-right">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -104,8 +104,8 @@
       @if (filteredUsers.length === 0) {
         <div class="empty-state">
           <mat-icon>group_off</mat-icon>
-          <h3>No user accounts found</h3>
-          <p>Create user credentials to grant manufacturing department access.</p>
+          <h3>No users found</h3>
+          <p>Add a user to get started.</p>
         </div>
       }
     </div>
@@ -119,8 +119,8 @@
           <div class="dialog-title-group">
             <mat-icon class="title-icon">admin_panel_settings</mat-icon>
             <div>
-              <h3>Create User Account</h3>
-              <p>Assign credentials and role authorizations</p>
+              <h3>New User</h3>
+              <p>Enter user details and role</p>
             </div>
           </div>
           <button class="close-icon-btn" (click)="closeModal()">
@@ -137,16 +137,16 @@
 
             <div class="form-group">
               <label>Password (Min. 6 chars) <span class="required">*</span></label>
-              <input type="password" formControlName="password" class="form-input" placeholder="Enter secure password" />
+              <input type="password" formControlName="password" class="form-input" placeholder="Enter password" />
             </div>
 
             <div class="form-group">
-              <label>Department Security Role <span class="required">*</span></label>
+              <label>Role <span class="required">*</span></label>
               <select formControlName="role" class="form-select">
-                <option value="ADMIN">ADMIN (Full System Access)</option>
-                <option value="SALES">SALES (Orders, Customers, Products)</option>
-                <option value="PURCHASE">PURCHASE (Suppliers, Materials, POs)</option>
-                <option value="ACCOUNTS">ACCOUNTS (Invoices & Payments)</option>
+                <option value="ADMIN">Admin</option>
+                <option value="SALES">Sales</option>
+                <option value="PURCHASE">Purchase</option>
+                <option value="ACCOUNTS">Accounts</option>
               </select>
             </div>
           </div>
@@ -155,7 +155,7 @@
             <button type="button" class="oc-btn-secondary" (click)="closeModal()">Cancel</button>
             <button type="submit" class="oc-btn-primary" [disabled]="userForm.invalid">
               <mat-icon>check</mat-icon>
-              <span>Create Account</span>
+              <span>Save User</span>
             </button>
           </div>
         </form>

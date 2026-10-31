@@ -6,15 +6,14 @@
         <mat-icon class="brand-icon">precision_manufacturing</mat-icon>
         <div class="brand-title-wrap">
           <span class="brand-name">OrderCraft</span>
-          <span class="brand-sub">Manufacturing Order Management System</span>
+          <span class="brand-sub">Manufacturing Operations</span>
         </div>
       </div>
 
       <div class="hero-headline-block">
-        <h1 class="hero-title">Automate your Order-to-Cash lifecycle.</h1>
+        <h1 class="hero-title">Manufacturing Operations</h1>
         <p class="hero-description">
-          A unified enterprise manufacturing suite unifying multi-tier Bill of Materials (BOM) explosion,
-          automated shortage procurement, real-time goods receipt inventory tracking, and corporate tax invoicing.
+          Manage sales orders, bill of materials, inventory stock, procurement, and billing.
         </p>
       </div>
 
@@ -24,8 +23,8 @@
             <mat-icon>account_tree</mat-icon>
           </div>
           <div class="feature-text">
-            <h4>BOM Shortage Engine</h4>
-            <p>Calculates exact component shortfalls across assembly orders.</p>
+            <h4>Bill of Materials</h4>
+            <p>Define component requirements for manufacturing.</p>
           </div>
         </div>
 
@@ -34,8 +33,8 @@
             <mat-icon>local_shipping</mat-icon>
           </div>
           <div class="feature-text">
-            <h4>1-Click Auto-Procurement</h4>
-            <p>Generates targeted purchase orders directly from stock shortfalls.</p>
+            <h4>Purchase Orders</h4>
+            <p>Generate purchase orders for stock shortages.</p>
           </div>
         </div>
 
@@ -44,8 +43,8 @@
             <mat-icon>inventory</mat-icon>
           </div>
           <div class="feature-text">
-            <h4>Real-Time Inventory Sync</h4>
-            <p>Goods receipt updates warehouse stock balances instantly.</p>
+            <h4>Inventory Management</h4>
+            <p>Track raw material stock levels and goods receipt.</p>
           </div>
         </div>
 
@@ -54,8 +53,8 @@
             <mat-icon>receipt_long</mat-icon>
           </div>
           <div class="feature-text">
-            <h4>Corporate Tax Invoicing</h4>
-            <p>Full payment ledger reconciliation with balance tracking.</p>
+            <h4>Invoices & Payments</h4>
+            <p>Generate customer invoices and record payments.</p>
           </div>
         </div>
       </div>
@@ -63,9 +62,9 @@
       <div class="hero-footer-status">
         <div class="status-indicator">
           <span class="status-dot"></span>
-          <span>Spring Boot 4.1.1 & Oracle / MySQL API Ready</span>
+          <span>OrderCraft Enterprise</span>
         </div>
-        <span class="version-label">OrderCraft v1.0.0-PROD</span>
+        <span class="version-label">v1.0.0</span>
       </div>
     </div>
   </div>
@@ -74,15 +73,15 @@
   <div class="auth-form-wrapper">
     <div class="form-container">
       <div class="form-header">
-        <h2 class="form-title">Welcome to OrderCraft</h2>
-        <p class="form-subtitle">Sign in to manage manufacturing orders and supply chain</p>
+        <h2 class="form-title">Sign In</h2>
+        <p class="form-subtitle">Enter your credentials to access OrderCraft</p>
       </div>
 
       <!-- Quick Demo Login Buttons -->
       <div class="demo-login-box">
         <div class="demo-title">
           <mat-icon>bolt</mat-icon>
-          <span>1-Click Demo Profiles</span>
+          <span>Demo Accounts</span>
         </div>
         <div class="demo-buttons-grid">
           @for (demo of demoRoles; track demo.role) {
@@ -105,7 +104,7 @@
       </div>
 
       <div class="divider-with-text">
-        <span>OR ENTER CREDENTIALS</span>
+        <span>OR SIGN IN WITH USERNAME</span>
       </div>
 
       @if (errorMessage) {
@@ -161,17 +160,17 @@
         >
           @if (isLoading) {
             <mat-spinner diameter="20" class="spinner"></mat-spinner>
-            <span>Authenticating...</span>
+            <span>Signing in...</span>
           } @else {
             <mat-icon>login</mat-icon>
-            <span>Sign In to Manufacturing OMS</span>
+            <span>Sign In</span>
           }
         </button>
       </form>
 
       <div class="security-notice">
-        <mat-icon>verified_user</mat-icon>
-        <span>Protected by Spring Security JWT & Role-Based Access Control</span>
+        <mat-icon>shield</mat-icon>
+        <span>Role-Based Access Control</span>
       </div>
     </div>
   </div>

@@ -1,0 +1,1 @@
+import{$t as io,ot as Wn}from"./main-PVJZMVCA.js";import{n as B}from"./chunk-BWEE3Mv8.js";var f=(()=>{class t{static ɵfac=function(n){return new(n||t)};static ɵmod=io({type:t});static ɵinj=Wn({imports:[B]})}return t})();export{f as t};

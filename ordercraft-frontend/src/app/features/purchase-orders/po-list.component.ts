@@ -90,7 +90,7 @@ export class PoListComponent implements OnInit {
         this.ngZone.run(() => { this.purchaseOrders = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.ngZone.run(() => { this.errorMessage = 'Failed to load purchase orders. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load purchase orders. Please check connection and retry.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }

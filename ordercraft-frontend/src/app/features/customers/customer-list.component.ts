@@ -66,7 +66,7 @@ export class CustomerListComponent implements OnInit {
         this.ngZone.run(() => { this.customers = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.ngZone.run(() => { this.errorMessage = 'Failed to load customers. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load customers. Please check connection and retry.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }

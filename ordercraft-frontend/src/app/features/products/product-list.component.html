@@ -4,9 +4,9 @@
   <!-- Top Header -->
   <div class="page-header">
     <div class="header-titles">
-      <div class="breadcrumb">Manufacturing / Engineering & Catalog</div>
-      <h2>Finished Goods & Bill of Materials (BOM)</h2>
-      <p>Configure engineered product specifications, bill of materials recipes, and production costing</p>
+      <div class="breadcrumb">Production</div>
+      <h2>Products & Bill of Materials</h2>
+      <p>Manage products and bill of materials components.</p>
     </div>
     <div class="header-actions">
       <button class="oc-btn-primary" (click)="openCreateProductModal()">
@@ -28,7 +28,7 @@
       />
     </div>
     <div class="meta-count">
-      <span>{{ filteredProducts.length }} products registered</span>
+      <span>{{ filteredProducts.length }} products</span>
     </div>
   </div>
 
@@ -36,13 +36,13 @@
   @if (isLoading) {
     <div class="state-container">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading finished goods catalog...</p>
+      <p>Loading products...</p>
     </div>
   } @else if (errorMessage) {
     <div class="state-container error">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button class="oc-btn-secondary" (click)="fetchProducts()">Retry Connection</button>
+      <button class="oc-btn-secondary" (click)="fetchProducts()">Retry</button>
     </div>
   } @else {
     <div class="oc-table-container">
@@ -51,8 +51,8 @@
           <tr>
             <th>SKU</th>
             <th>Product Name</th>
-            <th>Unit Selling Price</th>
-            <th>Bill of Materials (BOM)</th>
+            <th>Unit Price</th>
+            <th>Bill of Materials</th>
             <th class="text-right">Actions</th>
           </tr>
         </thead>
@@ -67,7 +67,7 @@
               <td>
                 <button class="btn-bom-badge" (click)="openBomModal(prod)">
                   <mat-icon>schema</mat-icon>
-                  <span>Configure BOM Recipe</span>
+                  <span>View BOM</span>
                 </button>
               </td>
               <td class="text-right">
@@ -88,8 +88,8 @@
       @if (filteredProducts.length === 0) {
         <div class="empty-state">
           <mat-icon>inventory_2</mat-icon>
-          <h3>No products in catalog</h3>
-          <p>Create your first manufactured product to define its bill-of-materials recipe.</p>
+          <h3>No products found</h3>
+          <p>Add a product to get started.</p>
         </div>
       }
     </div>
@@ -105,7 +105,7 @@
             <mat-icon class="bom-icon">schema</mat-icon>
             <div>
               <span class="mono sku-tag">{{ selectedProductForBom.sku }}</span>
-              <h3>BOM: {{ selectedProductForBom.name }}</h3>
+              <h3>Bill of Materials: {{ selectedProductForBom.name }}</h3>
             </div>
           </div>
           <button class="close-icon-btn" (click)="closeBomModal()">
@@ -117,21 +117,21 @@
           <!-- Cost Rollup Card -->
           <div class="cost-rollup-card">
             <div class="cost-item">
-              <span class="cost-label">Finished Selling Price</span>
+              <span class="cost-label">Unit Price</span>
               <span class="cost-val mono">₹{{ selectedProductForBom.unitPrice | number:'1.2-2' }}</span>
             </div>
             <div class="cost-item divider">
               <mat-icon>remove</mat-icon>
             </div>
             <div class="cost-item">
-              <span class="cost-label">Raw Material BOM Cost</span>
+              <span class="cost-label">Total Material Cost</span>
               <span class="cost-val mono text-primary">₹{{ calculateBomCost() | number:'1.2-2' }}</span>
             </div>
             <div class="cost-item divider">
               <mat-icon>drag_handle</mat-icon>
             </div>
             <div class="cost-item">
-              <span class="cost-label">Est. Contribution Margin</span>
+              <span class="cost-label">Margin</span>
               <span class="margin-badge" [class.positive]="calculateMargin() > 20" [class.negative]="calculateMargin() <= 0">
                 {{ calculateMargin() }}%
               </span>
@@ -140,22 +140,22 @@
 
           <!-- Add Material to BOM Inline Form -->
           <div class="add-bom-box">
-            <h4 class="box-title">Add Raw Component to Recipe</h4>
+            <h4 class="box-title">Add Component to BOM</h4>
             @if (bomErrorMessage) {
               <div class="error-banner">{{ bomErrorMessage }}</div>
             }
             <div class="inline-form-row">
               <div class="form-col" style="flex: 2;">
-                <label>Raw Material</label>
+                <label>Material</label>
                 <select [(ngModel)]="newBomMaterialId" class="form-select">
-                  <option [ngValue]="null" disabled>Select raw material...</option>
+                  <option [ngValue]="null" disabled>Select material...</option>
                   @for (m of materials; track m.id) {
                     <option [ngValue]="m.id">{{ m.name }} ({{ m.code }}) — ₹{{ m.unitCost }}/{{ m.unit }}</option>
                   }
                 </select>
               </div>
               <div class="form-col" style="flex: 1;">
-                <label>Qty per Unit</label>
+                <label>Quantity per Unit</label>
                 <input
                   type="number"
                   step="0.1"
@@ -172,7 +172,7 @@
                   (click)="addBomItem()"
                 >
                   <mat-icon>add</mat-icon>
-                  <span>Add Material</span>
+                  <span>Add Component</span>
                 </button>
               </div>
             </div>
@@ -180,11 +180,11 @@
 
           <!-- Exploded Components Table -->
           <div class="bom-table-section">
-            <h4 class="box-title">Exploded Raw Material Requirements (Per 1 Unit of Product)</h4>
+            <h4 class="box-title">Components (Per Unit)</h4>
             @if (isLoadingBom) {
               <div class="state-container">
                 <mat-spinner diameter="30"></mat-spinner>
-                <p>Loading BOM components...</p>
+                <p>Loading components...</p>
               </div>
             } @else {
               <div class="oc-table-container">
@@ -213,7 +213,7 @@
                           <button
                             class="btn-action-icon delete"
                             (click)="removeBomItem(item.id!)"
-                            matTooltip="Remove from BOM"
+                            matTooltip="Remove component"
                           >
                             <mat-icon>delete_outline</mat-icon>
                           </button>
@@ -225,7 +225,7 @@
 
                 @if (bomItems.length === 0) {
                   <div class="empty-state compact">
-                    <p>No materials linked to this product BOM yet. Add materials using the form above.</p>
+                    <p>No components in this bill of materials.</p>
                   </div>
                 }
               </div>
@@ -234,7 +234,7 @@
         </div>
 
         <div class="drawer-footer">
-          <button class="oc-btn-secondary" (click)="closeBomModal()">Close BOM Editor</button>
+          <button class="oc-btn-secondary" (click)="closeBomModal()">Close</button>
         </div>
       </div>
     </div>
@@ -248,8 +248,8 @@
           <div class="dialog-title-group">
             <mat-icon class="title-icon">inventory_2</mat-icon>
             <div>
-              <h3>{{ editingProduct ? 'Edit Product' : 'Create New Product' }}</h3>
-              <p>Define finished good details in the manufacturing catalog</p>
+              <h3>{{ editingProduct ? 'Edit Product' : 'New Product' }}</h3>
+              <p>Enter product details</p>
             </div>
           </div>
           <button class="close-icon-btn" (click)="closeProductModal()">
@@ -260,7 +260,7 @@
         <form [formGroup]="productForm" (ngSubmit)="saveProduct()">
           <div class="dialog-body">
             <div class="form-group">
-              <label>Product SKU Code <span class="required">*</span></label>
+              <label>SKU <span class="required">*</span></label>
               <input type="text" formControlName="sku" class="form-input mono" placeholder="e.g. PROD-MTR-500W" />
             </div>
 
@@ -270,7 +270,7 @@
             </div>
 
             <div class="form-group">
-              <label>Unit Selling Price (₹) <span class="required">*</span></label>
+              <label>Unit Price (₹) <span class="required">*</span></label>
               <input type="number" step="100" min="0" formControlName="unitPrice" class="form-input mono" placeholder="0.00" />
             </div>
           </div>
@@ -279,7 +279,7 @@
             <button type="button" class="oc-btn-secondary" (click)="closeProductModal()">Cancel</button>
             <button type="submit" class="oc-btn-primary" [disabled]="productForm.invalid">
               <mat-icon>check</mat-icon>
-              <span>{{ editingProduct ? 'Save Changes' : 'Create Product' }}</span>
+              <span>{{ editingProduct ? 'Save Changes' : 'Save Product' }}</span>
             </button>
           </div>
         </form>

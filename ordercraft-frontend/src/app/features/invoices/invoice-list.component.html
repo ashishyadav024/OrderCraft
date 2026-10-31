@@ -4,9 +4,9 @@
   <!-- Page Header -->
   <div class="page-header">
     <div class="header-titles">
-      <div class="breadcrumb">Manufacturing / Accounts & Finance</div>
-      <h2>Invoicing & Payment Settlement</h2>
-      <p>Issue tax invoices for completed production orders, track payment collections, and reconcile accounts receivable</p>
+      <div class="breadcrumb">Finance</div>
+      <h2>Invoices & Payments</h2>
+      <p>Manage customer invoices and payments.</p>
     </div>
   </div>
 
@@ -34,13 +34,13 @@
   @if (isLoading) {
     <div class="state-container">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading invoice ledgers...</p>
+      <p>Loading invoices...</p>
     </div>
   } @else if (errorMessage) {
     <div class="state-container error">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button class="oc-btn-secondary" (click)="fetchInvoices()">Retry Connection</button>
+      <button class="oc-btn-secondary" (click)="fetchInvoices()">Retry</button>
     </div>
   } @else {
     <div class="oc-table-container">
@@ -51,8 +51,8 @@
             <th>Customer</th>
             <th>Sales Order</th>
             <th>Status</th>
-            <th>Total Invoiced</th>
-            <th>Outstanding Balance</th>
+            <th>Total Amount</th>
+            <th>Balance Due</th>
             <th>Due Date</th>
             <th class="text-right">Actions</th>
           </tr>
@@ -62,7 +62,7 @@
             <tr class="inv-row" (click)="openInvoiceDetails(inv)">
               <td class="mono font-bold text-primary">{{ inv.invoiceNo }}</td>
               <td>
-                <strong>{{ inv.salesOrder?.customer?.name || 'Customer Account' }}</strong>
+                <strong>{{ inv.salesOrder?.customer?.name || 'N/A' }}</strong>
               </td>
               <td>
                 <span class="linked-order-tag">
@@ -90,17 +90,17 @@
               <td class="text-muted">{{ inv.dueDate | date:'mediumDate' }}</td>
               <td class="text-right" (click)="$event.stopPropagation()">
                 <div class="action-buttons">
-                  <button class="btn-action-icon" (click)="openInvoiceDetails(inv)" matTooltip="View Tax Invoice">
+                  <button class="btn-action-icon" (click)="openInvoiceDetails(inv)" matTooltip="View Invoice">
                     <mat-icon>receipt</mat-icon>
                   </button>
                   @if (inv.status !== 'PAID') {
                     <button
                       class="btn-pay-action"
                       (click)="openPaymentModal(inv)"
-                      matTooltip="Record Payment Transaction"
+                      matTooltip="Record Payment"
                     >
                       <mat-icon>payments</mat-icon>
-                      <span>Collect Payment</span>
+                      <span>Record Payment</span>
                     </button>
                   }
                 </div>
@@ -113,8 +113,8 @@
       @if (filteredInvoices.length === 0) {
         <div class="empty-state">
           <mat-icon>receipt_long</mat-icon>
-          <h3>No invoices recorded</h3>
-          <p>Generate invoices from Confirmed Sales Orders to bill manufacturing clients.</p>
+          <h3>No invoices found</h3>
+          <p>Invoices are generated from confirmed sales orders.</p>
         </div>
       }
     </div>
@@ -128,7 +128,7 @@
         <div class="drawer-header">
           <div class="drawer-title-row">
             <span class="status-chip" [attr.data-status]="selectedInvoice.status">{{ selectedInvoice.status }}</span>
-            <h3>Tax Invoice: {{ selectedInvoice.invoiceNo }}</h3>
+            <h3>Invoice: {{ selectedInvoice.invoiceNo }}</h3>
           </div>
           <div class="drawer-actions">
             <button class="btn-print" (click)="printInvoice()">
@@ -155,14 +155,14 @@
               </div>
             </div>
             <div class="invoice-tax-tag">
-              TAX INVOICE
+              INVOICE
             </div>
           </div>
 
           <!-- Metadata Section -->
           <div class="invoice-meta-grid">
             <div class="meta-block">
-              <span class="meta-label">Billed To (Client):</span>
+              <span class="meta-label">Billed To:</span>
               <strong class="client-name">{{ selectedInvoice.salesOrder?.customer?.name || 'Customer' }}</strong>
               <p>{{ selectedInvoice.salesOrder?.customer?.address || 'Industrial Premises' }}</p>
               <p>Email: {{ selectedInvoice.salesOrder?.customer?.email || 'N/A' }}</p>
@@ -174,15 +174,15 @@
                 <span class="mono font-bold">{{ selectedInvoice.invoiceNo }}</span>
               </div>
               <div class="meta-pair">
-                <span class="meta-label">Sales Order Reference:</span>
+                <span class="meta-label">Sales Order:</span>
                 <span class="mono font-bold">{{ selectedInvoice.salesOrder?.orderNo }}</span>
               </div>
               <div class="meta-pair">
-                <span class="meta-label">Date of Issue:</span>
+                <span class="meta-label">Invoice Date:</span>
                 <span>{{ selectedInvoice.invoiceDate | date:'fullDate' }}</span>
               </div>
               <div class="meta-pair">
-                <span class="meta-label">Payment Due Date:</span>
+                <span class="meta-label">Due Date:</span>
                 <span class="font-bold text-danger">{{ selectedInvoice.dueDate | date:'fullDate' }}</span>
               </div>
             </div>
@@ -194,7 +194,7 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Product Description</th>
+                  <th>Description</th>
                   <th class="text-right">Qty</th>
                   <th class="text-right">Unit Price</th>
                   <th class="text-right">Total (₹)</th>
@@ -221,15 +221,15 @@
           <div class="invoice-totals-section">
             <div class="totals-box">
               <div class="tot-row">
-                <span>Subtotal (Net Amount):</span>
+                <span>Subtotal:</span>
                 <span class="mono">₹{{ selectedInvoice.subtotal | number:'1.2-2' }}</span>
               </div>
               <div class="tot-row">
-                <span>Integrated GST (18.0%):</span>
+                <span>Tax (18%):</span>
                 <span class="mono">₹{{ selectedInvoice.taxAmount | number:'1.2-2' }}</span>
               </div>
               <div class="tot-row grand-total">
-                <strong>Grand Total (Inclusive of Taxes):</strong>
+                <strong>Total:</strong>
                 <strong class="mono text-primary">₹{{ selectedInvoice.totalAmount | number:'1.2-2' }}</strong>
               </div>
             </div>
@@ -240,10 +240,10 @@
             <div class="ledger-header">
               <h4>
                 <mat-icon>account_balance_wallet</mat-icon>
-                <span>Payment Settlement Ledger</span>
+                <span>Payment History</span>
               </h4>
               <div class="ledger-balance-pill">
-                <span>Outstanding:</span>
+                <span>Balance Due:</span>
                 <strong class="mono" [class.text-danger]="getRemainingBalance(selectedInvoice) > 0">
                   ₹{{ getRemainingBalance(selectedInvoice) | number:'1.2-2' }}
                 </strong>
@@ -267,8 +267,8 @@
                 <tr>
                   <th>Payment Date</th>
                   <th>Payment Method</th>
-                  <th>Reference / Txn #</th>
-                  <th class="text-right">Amount Credited</th>
+                  <th>Reference #</th>
+                  <th class="text-right">Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -284,7 +284,7 @@
                 }
                 @if (!selectedInvoice.payments || selectedInvoice.payments.length === 0) {
                   <tr>
-                    <td colspan="4" class="text-center text-muted">No payments recorded against this invoice yet.</td>
+                    <td colspan="4" class="text-center text-muted">No payments recorded.</td>
                   </tr>
                 }
               </tbody>
@@ -313,8 +313,8 @@
           <div class="dialog-title-group">
             <mat-icon class="title-icon">payments</mat-icon>
             <div>
-              <h3>Record Customer Payment</h3>
-              <p>Post collection against Invoice {{ paymentInvoice.invoiceNo }}</p>
+              <h3>Record Payment</h3>
+              <p>Record payment for Invoice {{ paymentInvoice.invoiceNo }}</p>
             </div>
           </div>
           <button class="close-icon-btn" (click)="closePaymentModal()">
@@ -344,7 +344,7 @@
                 <span class="b-val mono">₹{{ paymentInvoice.totalAmount | number:'1.2-2' }}</span>
               </div>
               <div class="banner-item">
-                <span class="b-label">Current Balance Due</span>
+                <span class="b-label">Balance Due</span>
                 <span class="b-val mono text-danger">₹{{ getRemainingBalance(paymentInvoice) | number:'1.2-2' }}</span>
               </div>
             </div>
@@ -369,15 +369,15 @@
             <div class="form-group">
               <label>Payment Method <span class="required">*</span></label>
               <select formControlName="method" class="form-select">
-                <option value="BANK_TRANSFER">Bank Wire Transfer (NEFT/RTGS/IMPS)</option>
-                <option value="UPI">UPI Digital Payment</option>
-                <option value="CARD">Credit / Debit Card</option>
-                <option value="CASH">Cash Deposit</option>
+                <option value="BANK_TRANSFER">Bank Transfer</option>
+                <option value="UPI">UPI</option>
+                <option value="CARD">Credit/Debit Card</option>
+                <option value="CASH">Cash</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label>Transaction / UTR Reference # <span class="required">*</span></label>
+              <label>Reference Number <span class="required">*</span></label>
               <input
                 type="text"
                 formControlName="referenceNo"
@@ -391,7 +391,7 @@
             <button type="button" class="oc-btn-secondary" (click)="closePaymentModal()">Cancel</button>
             <button type="submit" class="oc-btn-primary" [disabled]="paymentForm.invalid">
               <mat-icon>check</mat-icon>
-              <span>Confirm & Credit Ledger</span>
+              <span>Save Payment</span>
             </button>
           </div>
         </form>

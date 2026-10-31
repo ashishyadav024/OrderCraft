@@ -184,16 +184,16 @@ export class OrderListComponent implements OnInit {
       next: (generated) => {
         this.isGeneratingPO = false;
         if (generated.length === 0) {
-          this.poSuccessMessage = 'All required materials are already adequately in stock!';
+          this.poSuccessMessage = 'All required materials are in stock.';
         } else {
-          this.poSuccessMessage = `Successfully created ${generated.length} Purchase Order(s) for material shortages!`;
+          this.poSuccessMessage = `Created ${generated.length} purchase order(s) for material shortages.`;
           this.loadOrderBom(this.selectedOrder!.id);
         }
         this.cdr.detectChanges();
       },
       error: () => {
         this.isGeneratingPO = false;
-        this.poSuccessMessage = 'Error generating Purchase Orders.';
+        this.poSuccessMessage = 'Failed to create purchase orders.';
         this.cdr.detectChanges();
       }
     });
@@ -223,7 +223,7 @@ export class OrderListComponent implements OnInit {
       })
       .subscribe({
         next: (inv) => {
-          this.invoiceMessage = `Invoice ${inv.invoiceNo} generated successfully!`;
+          this.invoiceMessage = `Invoice ${inv.invoiceNo} created.`;
           setTimeout(() => {
             this.closeInvoiceModal();
             this.fetchOrders();

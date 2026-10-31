@@ -71,7 +71,7 @@ export class DashboardComponent implements OnInit {
       error: (err) => {
         this.ngZone.run(() => {
           console.error('Failed to load operational telemetry:', err);
-          this.errorMessage = 'Unable to synchronize operational telemetry. Please check backend connection and retry.';
+          this.errorMessage = 'Unable to load dashboard data. Please check connection and retry.';
           this.isLoading = false;
           this.cdr.detectChanges();
         });

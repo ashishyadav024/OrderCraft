@@ -87,7 +87,7 @@ export class ProductListComponent implements OnInit {
         this.ngZone.run(() => { this.products = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.ngZone.run(() => { this.errorMessage = 'Failed to load products. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load products. Please check connection and retry.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }
@@ -211,7 +211,7 @@ export class ProductListComponent implements OnInit {
         },
         error: (err) => {
           this.bomErrorMessage =
-            err?.error?.message || 'Material is already in this product BOM.';
+            err?.error?.message || 'Material is already in this bill of materials.';
         }
       });
   }

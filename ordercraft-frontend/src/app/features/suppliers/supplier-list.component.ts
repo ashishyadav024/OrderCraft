@@ -66,7 +66,7 @@ export class SupplierListComponent implements OnInit {
         this.ngZone.run(() => { this.suppliers = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.ngZone.run(() => { this.errorMessage = 'Failed to load suppliers. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load suppliers. Please check connection and retry.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }

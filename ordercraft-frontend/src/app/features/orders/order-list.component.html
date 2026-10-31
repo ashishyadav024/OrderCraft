@@ -4,9 +4,9 @@
   <!-- Top Bar & Title -->
   <div class="page-header">
     <div class="header-titles">
-      <div class="breadcrumb">Manufacturing / Sales & Work Orders</div>
-      <h2>Sales Orders Management</h2>
-      <p>Oversee client production orders, explode bills-of-materials, and trigger automated procurement</p>
+      <div class="breadcrumb">Sales</div>
+      <h2>Sales Orders</h2>
+      <p>Manage customer orders and material requirements.</p>
     </div>
     <div class="header-actions">
       <button class="oc-btn-primary" (click)="openCreateModal()">
@@ -46,13 +46,13 @@
   @if (isLoading) {
     <div class="state-container">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading manufacturing orders...</p>
+      <p>Loading sales orders...</p>
     </div>
   } @else if (errorMessage) {
     <div class="state-container error">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button class="oc-btn-secondary" (click)="fetchOrders()">Retry Connection</button>
+      <button class="oc-btn-secondary" (click)="fetchOrders()">Retry</button>
     </div>
   } @else {
     <!-- Main Orders Table -->
@@ -76,7 +76,7 @@
               <td>
                 <div class="customer-cell">
                   <strong>{{ order.customer?.name || order.customerName || 'N/A' }}</strong>
-                  <span class="sub-text">{{ order.customer?.address || 'Industrial Account' }}</span>
+                  <span class="sub-text">{{ order.customer?.address || '' }}</span>
                 </div>
               </td>
               <td>
@@ -85,17 +85,17 @@
                 </span>
               </td>
               <td>
-                <span class="items-badge">{{ order.items?.length || 1 }} product line(s)</span>
+                <span class="items-badge">{{ order.items?.length || 1 }} item(s)</span>
               </td>
               <td class="mono font-bold">₹{{ order.totalAmount | number:'1.2-2' }}</td>
               <td class="text-muted">{{ order.orderDate | date:'mediumDate' }}</td>
               <td class="text-right" (click)="$event.stopPropagation()">
                 <div class="action-buttons">
-                  <button class="btn-action-icon inspect" (click)="openOrderDetails(order)" matTooltip="Inspect BOM & Shortages">
+                  <button class="btn-action-icon inspect" (click)="openOrderDetails(order)" matTooltip="View Bill of Materials">
                     <mat-icon>schema</mat-icon>
                   </button>
                   @if (order.status !== 'INVOICED' && order.status !== 'PAID') {
-                    <button class="btn-action-icon invoice" (click)="openInvoiceModal(order.id)" matTooltip="Generate Tax Invoice">
+                    <button class="btn-action-icon invoice" (click)="openInvoiceModal(order.id)" matTooltip="Create Invoice">
                       <mat-icon>receipt_long</mat-icon>
                     </button>
                   }
@@ -110,7 +110,7 @@
         <div class="empty-state">
           <mat-icon>inbox</mat-icon>
           <h3>No sales orders found</h3>
-          <p>Try modifying your search or click "New Sales Order" to register a client requisition.</p>
+          <p>Create a sales order to get started.</p>
         </div>
       }
     </div>
@@ -152,14 +152,14 @@
           <!-- Finished Goods Items List -->
           <div class="section-box">
             <h4 class="section-title">
-              <mat-icon>precision_manufacturing</mat-icon>
-              <span>Ordered Finished Goods</span>
+              <mat-icon>inventory_2</mat-icon>
+              <span>Order Items</span>
             </h4>
             <div class="items-list-compact">
               @for (item of selectedOrder.items; track item.id) {
                 <div class="item-compact-row">
                   <div class="item-meta">
-                    <strong>{{ item.product?.name || 'Finished Product' }}</strong>
+                    <strong>{{ item.product?.name || 'Product' }}</strong>
                     <span class="mono text-muted">SKU: {{ item.product?.sku || 'PROD-N/A' }}</span>
                   </div>
                   <div class="item-calc">
@@ -176,7 +176,7 @@
             <div class="section-header-row">
               <h4 class="section-title">
                 <mat-icon>schema</mat-icon>
-                <span>Exploded Bill of Materials & Stock Shortages</span>
+                <span>Bill of Materials & Shortages</span>
               </h4>
               <button
                 class="btn-auto-po"
@@ -185,10 +185,10 @@
               >
                 @if (isGeneratingPO) {
                   <mat-spinner diameter="16"></mat-spinner>
-                  <span>Issuing POs...</span>
+                  <span>Creating POs...</span>
                 } @else {
-                  <mat-icon>electric_bolt</mat-icon>
-                  <span>Auto-Generate Purchase Orders</span>
+                  <mat-icon>add_shopping_cart</mat-icon>
+                  <span>Create Purchase Orders</span>
                 }
               </button>
             </div>
@@ -203,7 +203,7 @@
             @if (isLoadingBom) {
               <div class="bom-loading">
                 <mat-spinner diameter="28"></mat-spinner>
-                <p>Calculating exploded raw material requirements...</p>
+                <p>Loading material requirements...</p>
               </div>
             } @else {
               <div class="bom-table-wrap">
@@ -232,7 +232,7 @@
                             </span>
                           } @else {
                             <span class="shortage-badge success">
-                              Ready in Stock
+                              In Stock
                             </span>
                           }
                         </td>
@@ -252,7 +252,7 @@
           @if (selectedOrder.status !== 'INVOICED' && selectedOrder.status !== 'PAID') {
             <button class="oc-btn-primary" (click)="openInvoiceModal(selectedOrder.id)">
               <mat-icon>receipt_long</mat-icon>
-              <span>Generate Tax Invoice</span>
+              <span>Create Invoice</span>
             </button>
           }
         </div>
@@ -268,8 +268,8 @@
           <div class="dialog-title-group">
             <mat-icon class="title-icon">note_add</mat-icon>
             <div>
-              <h3>Create New Sales Order</h3>
-              <p>Configure client order items for manufacturing BOM calculation</p>
+              <h3>New Sales Order</h3>
+              <p>Enter order details and line items</p>
             </div>
           </div>
           <button class="close-icon-btn" (click)="closeCreateModal()">
@@ -281,9 +281,9 @@
           <div class="dialog-body">
             <!-- Customer Picker -->
             <div class="form-group">
-              <label>Select Customer <span class="required">*</span></label>
+              <label>Customer <span class="required">*</span></label>
               <select formControlName="customerId" class="form-select">
-                <option [ngValue]="null" disabled>Choose industrial customer account...</option>
+                <option [ngValue]="null" disabled>Select customer...</option>
                 @for (c of customers; track c.id) {
                   <option [ngValue]="c.id">{{ c.name }} ({{ c.address }})</option>
                 }
@@ -292,10 +292,10 @@
 
             <!-- Product Line Items -->
             <div class="section-subtitle-row">
-              <h4>Ordered Products</h4>
+              <h4>Line Items</h4>
               <button type="button" class="btn-add-item" (click)="addItemRow()">
                 <mat-icon>add</mat-icon>
-                <span>Add Product</span>
+                <span>Add Item</span>
               </button>
             </div>
 
@@ -303,7 +303,7 @@
               <table class="items-input-table">
                 <thead>
                   <tr>
-                    <th style="width: 45%;">Product (Finished Good)</th>
+                    <th style="width: 45%;">Product</th>
                     <th style="width: 20%;">Unit Price</th>
                     <th style="width: 20%;">Quantity</th>
                     <th style="width: 15%;" class="text-right">Action</th>
@@ -314,7 +314,7 @@
                     <tr [formGroupName]="$index">
                       <td>
                         <select formControlName="productId" class="form-select table-select">
-                          <option [ngValue]="null" disabled>Select Product SKU...</option>
+                          <option [ngValue]="null" disabled>Select product...</option>
                           @for (p of products; track p.id) {
                             <option [ngValue]="p.id">{{ p.name }} ({{ p.sku }}) — ₹{{ p.unitPrice }}</option>
                           }
@@ -349,7 +349,7 @@
 
             <!-- Total Preview Banner -->
             <div class="order-total-preview">
-              <span class="preview-label">Estimated Order Total:</span>
+              <span class="preview-label">Total Amount:</span>
               <span class="preview-val mono">₹{{ calculateLiveTotal() | number:'1.2-2' }}</span>
             </div>
           </div>
@@ -362,7 +362,7 @@
               [disabled]="orderForm.invalid || itemsFormArray.length === 0"
             >
               <mat-icon>check_circle</mat-icon>
-              <span>Confirm & Generate BOM</span>
+              <span>Save Order</span>
             </button>
           </div>
         </form>
@@ -378,8 +378,8 @@
           <div class="dialog-title-group">
             <mat-icon class="title-icon">receipt_long</mat-icon>
             <div>
-              <h3>Generate Manufacturing Tax Invoice</h3>
-              <p>Creates accounts receivable invoice linked to Sales Order #{{ invoiceOrderId }}</p>
+              <h3>Create Invoice</h3>
+              <p>Generate invoice for Sales Order #{{ invoiceOrderId }}</p>
             </div>
           </div>
           <button class="close-icon-btn" (click)="closeInvoiceModal()">
@@ -403,7 +403,7 @@
           <div class="form-group">
             <label>GST / Tax Rate (%)</label>
             <input type="number" step="0.5" min="0" [(ngModel)]="invoiceTaxRate" class="form-input mono" />
-            <span class="input-hint">Standard GST for manufactured capital goods is 18.0%</span>
+            <span class="input-hint">Default tax rate is 18%</span>
           </div>
         </div>
 
@@ -411,7 +411,7 @@
           <button type="button" class="oc-btn-secondary" (click)="closeInvoiceModal()">Cancel</button>
           <button type="button" class="oc-btn-primary" (click)="confirmGenerateInvoice()">
             <mat-icon>send</mat-icon>
-            <span>Issue Invoice</span>
+            <span>Create Invoice</span>
           </button>
         </div>
       </div>

@@ -74,7 +74,7 @@ export class InvoiceListComponent implements OnInit {
         this.ngZone.run(() => { this.invoices = data || []; this.applyFilter(); this.isLoading = false; this.cdr.detectChanges(); });
       },
       error: () => {
-        this.ngZone.run(() => { this.errorMessage = 'Failed to load invoices. Check backend connection.'; this.isLoading = false; this.cdr.detectChanges(); });
+        this.ngZone.run(() => { this.errorMessage = 'Failed to load invoices. Please check connection and retry.'; this.isLoading = false; this.cdr.detectChanges(); });
       }
     });
   }
@@ -191,7 +191,7 @@ export class InvoiceListComponent implements OnInit {
           }, 1000);
         },
         error: (err) => {
-          this.paymentError = err?.error?.message || 'Error recording payment.';
+          this.paymentError = err?.error?.message || 'Failed to record payment. Please try again.';
         }
       });
   }
