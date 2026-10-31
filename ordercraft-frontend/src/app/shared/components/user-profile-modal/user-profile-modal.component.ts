@@ -28,3 +28,4 @@ export class UserProfileModalComponent {
     this.openChangePassword.emit();
   }
 }
+

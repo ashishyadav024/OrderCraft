@@ -1,0 +1,19 @@
+services:
+  ordercraft-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ordercraft-app
+    ports:
+      - "8085:8085"
+    environment:
+      - PORT=8085
+      - SPRING_PROFILES_ACTIVE=prod
+      - APP_JWT_SECRET=OrderCraftSecretKeyForJwtAuthentication2026VeryLong
+    volumes:
+      - ordercraft_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  ordercraft_data:
+    driver: local
