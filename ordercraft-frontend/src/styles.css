@@ -119,6 +119,22 @@
   box-sizing: border-box;
 }
 
+button, input, optgroup, select, textarea {
+  font-family: inherit;
+}
+
+.cdk-overlay-container,
+.cdk-overlay-pane,
+.mat-mdc-menu-panel,
+.mat-mdc-menu-panel *:not(mat-icon) {
+  font-family: var(--font-sans) !important;
+}
+
+.mat-mdc-menu-panel mat-icon,
+.mat-mdc-menu-panel .mat-icon {
+  font-family: 'Material Icons' !important;
+}
+
 html, body {
   height: 100%;
   margin: 0;

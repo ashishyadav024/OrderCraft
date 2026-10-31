@@ -48,3 +48,9 @@ export interface RegisterResponse {
   role: string;
   message: string;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword?: string;
+}

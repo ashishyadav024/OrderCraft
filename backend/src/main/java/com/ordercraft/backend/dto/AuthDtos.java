@@ -69,4 +69,16 @@ public class AuthDtos {
     // Never includes the password hash
     public record UserResponse(Long id, String username, String role, boolean enabled) {
     }
+
+    public record ChangePasswordRequest(
+            @NotBlank(message = "Current password is required")
+            String currentPassword,
+
+            @NotBlank(message = "New password is required")
+            @Size(min = 8, message = "New password must be at least 8 characters")
+            String newPassword,
+
+            String confirmNewPassword
+    ) {
+    }
 }

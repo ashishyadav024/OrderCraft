@@ -221,11 +221,11 @@
 
         <mat-divider></mat-divider>
 
-        <button mat-menu-item routerLink="/dashboard">
+        <button mat-menu-item (click)="openProfileModal()">
           <mat-icon>person_outline</mat-icon>
           <span>My Profile</span>
         </button>
-        <button mat-menu-item routerLink="/dashboard">
+        <button mat-menu-item (click)="openChangePasswordModal()">
           <mat-icon>lock_outline</mat-icon>
           <span>Change Password</span>
         </button>
@@ -400,3 +400,17 @@
     </button>
   </div>
 </aside>
+
+<!-- Change Password Modal -->
+<app-change-password-modal
+  *ngIf="isChangePasswordModalOpen"
+  (close)="closeChangePasswordModal()"
+></app-change-password-modal>
+
+<!-- User Profile Modal -->
+<app-user-profile-modal
+  *ngIf="isProfileModalOpen"
+  [user]="user$ | async"
+  (close)="closeProfileModal()"
+  (openChangePassword)="openChangePasswordModal()"
+></app-user-profile-modal>

@@ -9,6 +9,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
+import { ChangePasswordModalComponent } from '../change-password-modal/change-password-modal.component';
+import { UserProfileModalComponent } from '../user-profile-modal/user-profile-modal.component';
 
 @Component({
   selector: 'app-navbar',
@@ -22,7 +24,9 @@ import { AuthService } from '../../../core/services/auth.service';
     MatIconModule,
     MatMenuModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    ChangePasswordModalComponent,
+    UserProfileModalComponent
   ],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css']
@@ -34,6 +38,8 @@ export class Navbar {
   user$ = this.authService.user$;
   availableRoles = ['ADMIN', 'SALES', 'PURCHASE', 'ACCOUNTS'];
   isMobileDrawerOpen = false;
+  isChangePasswordModalOpen = false;
+  isProfileModalOpen = false;
 
   constructor() {
     this.router.events.pipe(
@@ -41,6 +47,26 @@ export class Navbar {
     ).subscribe(() => {
       this.closeMobileDrawer();
     });
+  }
+
+  openChangePasswordModal(): void {
+    this.closeMobileDrawer();
+    this.isProfileModalOpen = false;
+    this.isChangePasswordModalOpen = true;
+  }
+
+  closeChangePasswordModal(): void {
+    this.isChangePasswordModalOpen = false;
+  }
+
+  openProfileModal(): void {
+    this.closeMobileDrawer();
+    this.isChangePasswordModalOpen = false;
+    this.isProfileModalOpen = true;
+  }
+
+  closeProfileModal(): void {
+    this.isProfileModalOpen = false;
   }
 
   @HostListener('window:keydown.escape')

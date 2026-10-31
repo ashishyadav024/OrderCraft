@@ -129,4 +129,34 @@ public class AuthController {
                 "Account created successfully"
         );
     }
+
+    @PostMapping("/change-password")
+    public java.util.Map<String, String> changePassword(
+            @Valid @RequestBody com.ordercraft.backend.dto.AuthDtos.ChangePasswordRequest request,
+            org.springframework.security.core.Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not authenticated");
+        }
+
+        String username = authentication.getName();
+        AppUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Verify current password
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current password is incorrect");
+        }
+
+        // Verify confirm password if present
+        if (request.confirmNewPassword() != null && !request.confirmNewPassword().isBlank()
+                && !request.newPassword().equals(request.confirmNewPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password and confirmation do not match");
+        }
+
+        // Update password with BCrypt hash
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        return java.util.Map.of("message", "Password changed successfully");
+    }
 }

@@ -1,0 +1,80 @@
+<div class="modal-backdrop" (click)="onClose()" aria-hidden="true"></div>
+
+<div
+  class="modal-dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="profile-dialog-title"
+  (click)="$event.stopPropagation()"
+>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <div class="modal-title-wrap">
+      <div class="modal-icon-badge">
+        <mat-icon>badge</mat-icon>
+      </div>
+      <div>
+        <h2 id="profile-dialog-title" class="modal-title">My Profile</h2>
+        <p class="modal-subtitle">User account details & permissions</p>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="close-button"
+      (click)="onClose()"
+      aria-label="Close profile dialog"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="profile-card" *ngIf="user">
+    <div class="profile-avatar-large">
+      {{ user.username.substring(0, 1).toUpperCase() }}
+    </div>
+    <div class="profile-primary-info">
+      <h3 class="profile-fullname">{{ user.fullName || user.username }}</h3>
+      <span class="profile-username">&#64;{{ user.username }}</span>
+      <span class="profile-role-tag" [ngClass]="user.role">{{ user.role }}</span>
+    </div>
+  </div>
+
+  <!-- Detail Rows -->
+  <div class="profile-details-list" *ngIf="user">
+    <div class="detail-row">
+      <div class="detail-label">
+        <mat-icon class="detail-icon">email</mat-icon>
+        <span>Email Address</span>
+      </div>
+      <div class="detail-value">{{ user.email || (user.username + '@ordercraft.com') }}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-label">
+        <mat-icon class="detail-icon">security</mat-icon>
+        <span>Assigned Role</span>
+      </div>
+      <div class="detail-value">{{ user.role }}</div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-label">
+        <mat-icon class="detail-icon">verified_user</mat-icon>
+        <span>Account Status</span>
+      </div>
+      <div class="detail-value status-active">Active</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="modal-actions">
+    <button type="button" class="btn-outlined" (click)="onChangePassword()">
+      <mat-icon class="btn-icon">lock_reset</mat-icon>
+      <span>Change Password</span>
+    </button>
+    <button type="button" class="btn-primary" (click)="onClose()">
+      <span>Done</span>
+    </button>
+  </div>
+</div>
