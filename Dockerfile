@@ -8,8 +8,10 @@
 # ------------------------------------------------------------------------------
 # Stage 1: Build Angular Frontend
 # ------------------------------------------------------------------------------
-FROM node:20-alpine AS frontend-builder
+FROM node:24-alpine AS frontend-builder
 WORKDIR /build/frontend
+
+ENV NG_FORCE_COMPAT=true
 
 COPY ordercraft-frontend/package*.json ./
 RUN npm ci
@@ -59,3 +61,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
   CMD curl -f http://localhost:${PORT}/h2-console || exit 1
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/ordercraft.jar"]
+
