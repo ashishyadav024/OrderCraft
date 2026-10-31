@@ -26,7 +26,7 @@
 
     <!-- Center-Left: Desktop Navigation (>= 992px) -->
     <nav class="nav-links desktop-nav" aria-label="Main Navigation">
-      <!-- 1. Dashboard -->
+      <!-- 1. Dashboard (All authenticated roles) -->
       <a
         routerLink="/dashboard"
         routerLinkActive="active"
@@ -38,129 +38,141 @@
         <span>Dashboard</span>
       </a>
 
-      <!-- 2. Sales (Dropdown: Orders, Customers) -->
-      <button
-        type="button"
-        class="nav-item nav-dropdown-btn"
-        [class.active]="isSalesActive()"
-        [matMenuTriggerFor]="salesMenu"
-        aria-label="Sales Navigation Menu"
-        aria-haspopup="true"
-      >
-        <mat-icon>point_of_sale</mat-icon>
-        <span>Sales</span>
-        <mat-icon class="dropdown-caret">expand_more</mat-icon>
-      </button>
-      <mat-menu #salesMenu="matMenu" class="oc-nav-dropdown-menu">
-        <a mat-menu-item routerLink="/orders">
-          <mat-icon>assignment</mat-icon>
-          <div class="menu-item-content">
-            <span class="menu-item-title">Sales Orders</span>
-            <span class="menu-item-desc">Customer orders and fulfillment</span>
-          </div>
-        </a>
-        <a mat-menu-item routerLink="/customers">
-          <mat-icon>people</mat-icon>
-          <div class="menu-item-content">
-            <span class="menu-item-title">Customers</span>
-            <span class="menu-item-desc">Customer directory</span>
-          </div>
-        </a>
-      </mat-menu>
+      <!-- 2. Sales (Dropdown: Orders, Customers) - Permitted: ADMIN, SALES -->
+      @if (canAccess(['ADMIN', 'SALES'])) {
+        <button
+          type="button"
+          class="nav-item nav-dropdown-btn"
+          [class.active]="isSalesActive()"
+          [matMenuTriggerFor]="salesMenu"
+          aria-label="Sales Navigation Menu"
+          aria-haspopup="true"
+        >
+          <mat-icon>point_of_sale</mat-icon>
+          <span>Sales</span>
+          <mat-icon class="dropdown-caret">expand_more</mat-icon>
+        </button>
+        <mat-menu #salesMenu="matMenu" class="oc-nav-dropdown-menu">
+          <a mat-menu-item routerLink="/orders">
+            <mat-icon>assignment</mat-icon>
+            <div class="menu-item-content">
+              <span class="menu-item-title">Sales Orders</span>
+              <span class="menu-item-desc">Customer orders and fulfillment</span>
+            </div>
+          </a>
+          <a mat-menu-item routerLink="/customers">
+            <mat-icon>people</mat-icon>
+            <div class="menu-item-content">
+              <span class="menu-item-title">Customers</span>
+              <span class="menu-item-desc">Customer directory</span>
+            </div>
+          </a>
+        </mat-menu>
+      }
 
-      <!-- 3. Production (Dropdown: Products & BOM, Materials) -->
-      <button
-        type="button"
-        class="nav-item nav-dropdown-btn"
-        [class.active]="isProductionActive()"
-        [matMenuTriggerFor]="productionMenu"
-        aria-label="Production Navigation Menu"
-        aria-haspopup="true"
-      >
-        <mat-icon>precision_manufacturing</mat-icon>
-        <span>Production</span>
-        <mat-icon class="dropdown-caret">expand_more</mat-icon>
-      </button>
-      <mat-menu #productionMenu="matMenu" class="oc-nav-dropdown-menu">
-        <a mat-menu-item routerLink="/products">
-          <mat-icon>inventory_2</mat-icon>
-          <div class="menu-item-content">
-            <span class="menu-item-title">Products & BOM</span>
-            <span class="menu-item-desc">Products and bill of materials</span>
-          </div>
-        </a>
-        <a mat-menu-item routerLink="/materials">
-          <mat-icon>layers</mat-icon>
-          <div class="menu-item-content">
-            <span class="menu-item-title">Materials</span>
-            <span class="menu-item-desc">Raw materials and stock levels</span>
-          </div>
-        </a>
-      </mat-menu>
+      <!-- 3. Production (Dropdown: Products & BOM, Materials) - Permitted: ADMIN, SALES, PURCHASE -->
+      @if (canAccess(['ADMIN', 'SALES', 'PURCHASE'])) {
+        <button
+          type="button"
+          class="nav-item nav-dropdown-btn"
+          [class.active]="isProductionActive()"
+          [matMenuTriggerFor]="productionMenu"
+          aria-label="Production Navigation Menu"
+          aria-haspopup="true"
+        >
+          <mat-icon>precision_manufacturing</mat-icon>
+          <span>Production</span>
+          <mat-icon class="dropdown-caret">expand_more</mat-icon>
+        </button>
+        <mat-menu #productionMenu="matMenu" class="oc-nav-dropdown-menu">
+          @if (canAccess(['ADMIN', 'SALES'])) {
+            <a mat-menu-item routerLink="/products">
+              <mat-icon>inventory_2</mat-icon>
+              <div class="menu-item-content">
+                <span class="menu-item-title">Products & BOM</span>
+                <span class="menu-item-desc">Products and bill of materials</span>
+              </div>
+            </a>
+          }
+          @if (canAccess(['ADMIN', 'PURCHASE'])) {
+            <a mat-menu-item routerLink="/materials">
+              <mat-icon>layers</mat-icon>
+              <div class="menu-item-content">
+                <span class="menu-item-title">Materials</span>
+                <span class="menu-item-desc">Raw materials and stock levels</span>
+              </div>
+            </a>
+          }
+        </mat-menu>
+      }
 
-      <!-- 4. Procurement (Dropdown: Purchase Orders, Suppliers) -->
-      <button
-        type="button"
-        class="nav-item nav-dropdown-btn"
-        [class.active]="isProcurementActive()"
-        [matMenuTriggerFor]="procurementMenu"
-        aria-label="Procurement Navigation Menu"
-        aria-haspopup="true"
-      >
-        <mat-icon>local_shipping</mat-icon>
-        <span>Procurement</span>
-        <mat-icon class="dropdown-caret">expand_more</mat-icon>
-      </button>
-      <mat-menu #procurementMenu="matMenu" class="oc-nav-dropdown-menu">
-        <a mat-menu-item routerLink="/purchase-orders">
+      <!-- 4. Procurement (Dropdown: Purchase Orders, Suppliers) - Permitted: ADMIN, PURCHASE -->
+      @if (canAccess(['ADMIN', 'PURCHASE'])) {
+        <button
+          type="button"
+          class="nav-item nav-dropdown-btn"
+          [class.active]="isProcurementActive()"
+          [matMenuTriggerFor]="procurementMenu"
+          aria-label="Procurement Navigation Menu"
+          aria-haspopup="true"
+        >
           <mat-icon>local_shipping</mat-icon>
-          <div class="menu-item-content">
-            <span class="menu-item-title">Purchase Orders</span>
-            <span class="menu-item-desc">Purchase orders and goods receipt</span>
-          </div>
-        </a>
-        <a mat-menu-item routerLink="/suppliers">
-          <mat-icon>business</mat-icon>
-          <div class="menu-item-content">
-            <span class="menu-item-title">Suppliers</span>
-            <span class="menu-item-desc">Supplier directory</span>
-          </div>
-        </a>
-      </mat-menu>
+          <span>Procurement</span>
+          <mat-icon class="dropdown-caret">expand_more</mat-icon>
+        </button>
+        <mat-menu #procurementMenu="matMenu" class="oc-nav-dropdown-menu">
+          <a mat-menu-item routerLink="/purchase-orders">
+            <mat-icon>local_shipping</mat-icon>
+            <div class="menu-item-content">
+              <span class="menu-item-title">Purchase Orders</span>
+              <span class="menu-item-desc">Purchase orders and goods receipt</span>
+            </div>
+          </a>
+          <a mat-menu-item routerLink="/suppliers">
+            <mat-icon>business</mat-icon>
+            <div class="menu-item-content">
+              <span class="menu-item-title">Suppliers</span>
+              <span class="menu-item-desc">Supplier directory</span>
+            </div>
+          </a>
+        </mat-menu>
+      }
 
-      <!-- 5. Finance (Invoices & Payments) -->
-      <a
-        routerLink="/invoices"
-        routerLinkActive="active"
-        class="nav-item"
-        title="Finance: Invoices and Payments"
-      >
-        <mat-icon>receipt_long</mat-icon>
-        <span>Finance</span>
-      </a>
-
-      <!-- 6. Reports/Admin (Dropdown) -->
-      <button
-        type="button"
-        class="nav-item nav-dropdown-btn"
-        [class.active]="isAdminActive()"
-        [matMenuTriggerFor]="adminMenu"
-        aria-label="Reports and Administration Menu"
-        aria-haspopup="true"
-      >
-        <mat-icon>admin_panel_settings</mat-icon>
-        <span>Reports/Admin</span>
-        <mat-icon class="dropdown-caret">expand_more</mat-icon>
-      </button>
-      <mat-menu #adminMenu="matMenu" class="oc-nav-dropdown-menu">
-        <a mat-menu-item routerLink="/dashboard">
-          <mat-icon>insights</mat-icon>
-          <div class="menu-item-content">
-            <span class="menu-item-title">Dashboard</span>
-            <span class="menu-item-desc">Overview and metrics</span>
-          </div>
+      <!-- 5. Finance (Invoices & Payments) - Permitted: ADMIN, ACCOUNTS -->
+      @if (canAccess(['ADMIN', 'ACCOUNTS'])) {
+        <a
+          routerLink="/invoices"
+          routerLinkActive="active"
+          class="nav-item"
+          title="Finance: Invoices and Payments"
+        >
+          <mat-icon>receipt_long</mat-icon>
+          <span>Finance</span>
         </a>
-        @if (canAccess(['ADMIN'])) {
+      }
+
+      <!-- 6. Reports/Admin (Dropdown) - Permitted: ADMIN only -->
+      @if (canAccess(['ADMIN'])) {
+        <button
+          type="button"
+          class="nav-item nav-dropdown-btn"
+          [class.active]="isAdminActive()"
+          [matMenuTriggerFor]="adminMenu"
+          aria-label="Reports and Administration Menu"
+          aria-haspopup="true"
+        >
+          <mat-icon>admin_panel_settings</mat-icon>
+          <span>Reports/Admin</span>
+          <mat-icon class="dropdown-caret">expand_more</mat-icon>
+        </button>
+        <mat-menu #adminMenu="matMenu" class="oc-nav-dropdown-menu">
+          <a mat-menu-item routerLink="/dashboard">
+            <mat-icon>insights</mat-icon>
+            <div class="menu-item-content">
+              <span class="menu-item-title">Dashboard</span>
+              <span class="menu-item-desc">Overview and metrics</span>
+            </div>
+          </a>
           <a mat-menu-item routerLink="/users">
             <mat-icon>manage_accounts</mat-icon>
             <div class="menu-item-content">
@@ -168,8 +180,8 @@
               <span class="menu-item-desc">User accounts and permissions</span>
             </div>
           </a>
-        }
-      </mat-menu>
+        </mat-menu>
+      }
     </nav>
 
     <!-- Right: User Profile + Role + Logout Menu -->
@@ -283,6 +295,7 @@
 
   <!-- Drawer Scrollable Navigation Links -->
   <nav class="drawer-nav">
+    <!-- Overview (All authenticated) -->
     <div class="drawer-nav-section">
       <span class="drawer-section-title">Overview</span>
       <a routerLink="/dashboard" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
@@ -291,57 +304,76 @@
       </a>
     </div>
 
-    <div class="drawer-nav-section">
-      <span class="drawer-section-title">Sales</span>
-      <a routerLink="/orders" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
-        <mat-icon>assignment</mat-icon>
-        <span>Sales Orders</span>
-      </a>
-      <a routerLink="/customers" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
-        <mat-icon>people</mat-icon>
-        <span>Customers</span>
-      </a>
-    </div>
+    <!-- Sales - Permitted: ADMIN, SALES -->
+    @if (canAccess(['ADMIN', 'SALES'])) {
+      <div class="drawer-nav-section">
+        <span class="drawer-section-title">Sales</span>
+        <a routerLink="/orders" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+          <mat-icon>assignment</mat-icon>
+          <span>Sales Orders</span>
+        </a>
+        <a routerLink="/customers" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+          <mat-icon>people</mat-icon>
+          <span>Customers</span>
+        </a>
+      </div>
+    }
 
-    <div class="drawer-nav-section">
-      <span class="drawer-section-title">Production</span>
-      <a routerLink="/products" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
-        <mat-icon>inventory_2</mat-icon>
-        <span>Products & BOM</span>
-      </a>
-      <a routerLink="/materials" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
-        <mat-icon>layers</mat-icon>
-        <span>Materials</span>
-      </a>
-    </div>
+    <!-- Production - Permitted: ADMIN, SALES, PURCHASE -->
+    @if (canAccess(['ADMIN', 'SALES', 'PURCHASE'])) {
+      <div class="drawer-nav-section">
+        <span class="drawer-section-title">Production</span>
+        @if (canAccess(['ADMIN', 'SALES'])) {
+          <a routerLink="/products" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+            <mat-icon>inventory_2</mat-icon>
+            <span>Products & BOM</span>
+          </a>
+        }
+        @if (canAccess(['ADMIN', 'PURCHASE'])) {
+          <a routerLink="/materials" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+            <mat-icon>layers</mat-icon>
+            <span>Materials</span>
+          </a>
+        }
+      </div>
+    }
 
-    <div class="drawer-nav-section">
-      <span class="drawer-section-title">Procurement</span>
-      <a routerLink="/purchase-orders" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
-        <mat-icon>local_shipping</mat-icon>
-        <span>Purchase Orders</span>
-      </a>
-      <a routerLink="/suppliers" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
-        <mat-icon>business</mat-icon>
-        <span>Suppliers</span>
-      </a>
-    </div>
+    <!-- Procurement - Permitted: ADMIN, PURCHASE -->
+    @if (canAccess(['ADMIN', 'PURCHASE'])) {
+      <div class="drawer-nav-section">
+        <span class="drawer-section-title">Procurement</span>
+        <a routerLink="/purchase-orders" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+          <mat-icon>local_shipping</mat-icon>
+          <span>Purchase Orders</span>
+        </a>
+        <a routerLink="/suppliers" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+          <mat-icon>business</mat-icon>
+          <span>Suppliers</span>
+        </a>
+      </div>
+    }
 
-    <div class="drawer-nav-section">
-      <span class="drawer-section-title">Finance</span>
-      <a routerLink="/invoices" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
-        <mat-icon>receipt_long</mat-icon>
-        <span>Invoices & Payments</span>
-      </a>
-    </div>
+    <!-- Finance - Permitted: ADMIN, ACCOUNTS -->
+    @if (canAccess(['ADMIN', 'ACCOUNTS'])) {
+      <div class="drawer-nav-section">
+        <span class="drawer-section-title">Finance</span>
+        <a routerLink="/invoices" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+          <mat-icon>receipt_long</mat-icon>
+          <span>Invoices & Payments</span>
+        </a>
+      </div>
+    }
 
-    <div class="drawer-nav-section" *ngIf="canAccess(['ADMIN'])">
-      <span class="drawer-section-title">Administration</span>
-      <a routerLink="/users" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
-        <mat-icon>manage_accounts</mat-icon>
-        <span>Users</span>
-      </a>
-    </div>
+    <!-- Administration - Permitted: ADMIN only -->
+    @if (canAccess(['ADMIN'])) {
+      <div class="drawer-nav-section">
+        <span class="drawer-section-title">Administration</span>
+        <a routerLink="/users" (click)="closeMobileDrawer()" class="drawer-link" routerLinkActive="active">
+          <mat-icon>manage_accounts</mat-icon>
+          <span>Users</span>
+        </a>
+      </div>
+    }
 
     <!-- Quick Role Switcher in Mobile Drawer -->
     <div class="drawer-nav-section" *ngIf="user$ | async as user">

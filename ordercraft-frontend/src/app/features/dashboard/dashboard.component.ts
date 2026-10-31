@@ -79,19 +79,34 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  canAccess(roles: string[]): boolean {
+    const current = this.authService.getUserRole();
+    if (!current) return false;
+    if (current === 'ADMIN') return true;
+    return roles.includes(current);
+  }
+
   navigateToOrders(): void {
-    this.router.navigate(['/orders']);
+    if (this.canAccess(['ADMIN', 'SALES'])) {
+      this.router.navigate(['/orders']);
+    }
   }
 
   navigateToMaterials(): void {
-    this.router.navigate(['/materials']);
+    if (this.canAccess(['ADMIN', 'PURCHASE'])) {
+      this.router.navigate(['/materials']);
+    }
   }
 
   navigateToProcurement(): void {
-    this.router.navigate(['/purchase-orders']);
+    if (this.canAccess(['ADMIN', 'PURCHASE'])) {
+      this.router.navigate(['/purchase-orders']);
+    }
   }
 
   navigateToInvoices(): void {
-    this.router.navigate(['/invoices']);
+    if (this.canAccess(['ADMIN', 'ACCOUNTS'])) {
+      this.router.navigate(['/invoices']);
+    }
   }
 }

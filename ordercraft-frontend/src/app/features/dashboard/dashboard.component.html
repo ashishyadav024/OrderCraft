@@ -8,14 +8,18 @@
       <span class="page-subtitle">{{ today | date:'mediumDate' }}</span>
     </div>
     <div class="page-actions">
-      <button type="button" class="btn-secondary" (click)="navigateToProcurement()">
-        <mat-icon>add_shopping_cart</mat-icon>
-        <span>Create Purchase Order</span>
-      </button>
-      <button type="button" class="btn-primary" (click)="navigateToOrders()">
-        <mat-icon>add</mat-icon>
-        <span>New Sales Order</span>
-      </button>
+      @if (canAccess(['ADMIN', 'PURCHASE'])) {
+        <button type="button" class="btn-secondary" (click)="navigateToProcurement()">
+          <mat-icon>add_shopping_cart</mat-icon>
+          <span>Create Purchase Order</span>
+        </button>
+      }
+      @if (canAccess(['ADMIN', 'SALES'])) {
+        <button type="button" class="btn-primary" (click)="navigateToOrders()">
+          <mat-icon>add</mat-icon>
+          <span>New Sales Order</span>
+        </button>
+      }
     </div>
   </div>
 

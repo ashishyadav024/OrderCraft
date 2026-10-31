@@ -22,43 +22,50 @@ export const routes: Routes = [
   },
   {
     path: 'orders',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'SALES'] },
     loadComponent: () =>
       import('./features/orders/order-list.component').then((m) => m.OrderListComponent)
   },
   {
     path: 'products',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'SALES'] },
     loadComponent: () =>
       import('./features/products/product-list.component').then((m) => m.ProductListComponent)
   },
   {
     path: 'materials',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'PURCHASE'] },
     loadComponent: () =>
       import('./features/materials/material-list.component').then((m) => m.MaterialListComponent)
   },
   {
     path: 'purchase-orders',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'PURCHASE'] },
     loadComponent: () =>
       import('./features/purchase-orders/po-list.component').then((m) => m.PoListComponent)
   },
   {
     path: 'invoices',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'ACCOUNTS'] },
     loadComponent: () =>
       import('./features/invoices/invoice-list.component').then((m) => m.InvoiceListComponent)
   },
   {
     path: 'customers',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'SALES'] },
     loadComponent: () =>
       import('./features/customers/customer-list.component').then((m) => m.CustomerListComponent)
   },
   {
     path: 'suppliers',
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'PURCHASE'] },
     loadComponent: () =>
       import('./features/suppliers/supplier-list.component').then((m) => m.SupplierListComponent)
   },
