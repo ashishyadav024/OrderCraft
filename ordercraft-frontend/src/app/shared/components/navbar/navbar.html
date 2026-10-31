@@ -186,55 +186,53 @@
 
     <!-- Right: User Profile + Role + Logout Menu -->
     <div class="header-right" *ngIf="user$ | async as user">
-      <!-- Role Badge -->
-      <span class="role-badge" [ngClass]="user.role" [matTooltip]="'Active Role Profile: ' + user.role">
-        {{ user.role }}
-      </span>
-
-      <!-- User Profile Menu Trigger -->
+      <!-- Rebuilt as ONE single user-menu trigger button: [ (A) admin ADMIN-badge ⌄ ] -->
       <button
         type="button"
-        mat-button
+        class="user-menu-trigger"
         [matMenuTriggerFor]="userProfileMenu"
-        class="user-profile-btn"
-        aria-label="User account and profile menu"
+        #userMenuTrigger="matMenuTrigger"
+        [attr.aria-expanded]="userMenuTrigger.menuOpen"
         aria-haspopup="true"
+        aria-label="User account and profile menu"
       >
-        <div class="avatar-circle">
+        <span class="user-avatar-circle" aria-hidden="true">
           {{ user.username.substring(0, 1).toUpperCase() }}
-        </div>
-        <span class="user-display-name">{{ user.username }}</span>
-        <mat-icon class="dropdown-caret">expand_more</mat-icon>
+        </span>
+        <span class="user-name-text">{{ user.username }}</span>
+        <span class="user-role-badge" [ngClass]="user.role">{{ user.role }}</span>
+        <mat-icon class="user-dropdown-chevron" [class.rotated]="userMenuTrigger.menuOpen" aria-hidden="true">
+          expand_more
+        </mat-icon>
       </button>
 
-      <!-- User Profile Menu -->
-      <mat-menu #userProfileMenu="matMenu" class="modern-user-menu" xPosition="before">
-        <div class="user-menu-header">
-          <div class="user-avatar-lg">
+      <!-- Dropdown Menu: header (full name + email + role), dividers, items, sign out -->
+      <mat-menu #userProfileMenu="matMenu" class="user-profile-menu-panel" xPosition="before">
+        <div class="user-dropdown-header" (click)="$event.stopPropagation()">
+          <div class="user-dropdown-avatar">
             {{ user.username.substring(0, 1).toUpperCase() }}
           </div>
-          <div class="user-details">
-            <span class="user-fullname">{{ user.username }}</span>
-            <span class="user-role-tag" [ngClass]="user.role">{{ user.role }}</span>
+          <div class="user-dropdown-info">
+            <span class="user-dropdown-fullname">{{ user.fullName || user.username }}</span>
+            <span class="user-dropdown-email">{{ user.email || (user.username + '@ordercraft.com') }}</span>
+            <span class="user-dropdown-role-badge" [ngClass]="user.role">{{ user.role }}</span>
           </div>
         </div>
 
         <mat-divider></mat-divider>
 
-        <div class="menu-section-title">Switch Role:</div>
-        @for (r of availableRoles; track r) {
-          <button mat-menu-item (click)="onSwitchRole(r)" [class.active-role-item]="r === user.role">
-            <mat-icon>{{ getRoleIcon(r) }}</mat-icon>
-            <span>{{ r }}</span>
-            @if (r === user.role) {
-              <mat-icon class="check-icon">check</mat-icon>
-            }
-          </button>
-        }
+        <button mat-menu-item routerLink="/dashboard">
+          <mat-icon>person_outline</mat-icon>
+          <span>My Profile</span>
+        </button>
+        <button mat-menu-item routerLink="/dashboard">
+          <mat-icon>lock_outline</mat-icon>
+          <span>Change Password</span>
+        </button>
 
         <mat-divider></mat-divider>
 
-        <button mat-menu-item (click)="onLogout()" class="logout-menu-item">
+        <button mat-menu-item (click)="onLogout()" class="user-dropdown-signout-item">
           <mat-icon>logout</mat-icon>
           <span>Sign Out</span>
         </button>

@@ -87,7 +87,12 @@ export class AuthService {
     const userJson = localStorage.getItem(this.USER_KEY);
     if (!userJson) return null;
     try {
-      return JSON.parse(userJson);
+      const session = JSON.parse(userJson);
+      if (session && session.username) {
+        if (!session.fullName) session.fullName = session.username;
+        if (!session.email) session.email = `${session.username.toLowerCase()}@ordercraft.com`;
+      }
+      return session;
     } catch {
       return null;
     }
@@ -96,7 +101,9 @@ export class AuthService {
   private setSession(authResult: LoginResponse): void {
     const userSession: UserSession = {
       username: authResult.username,
-      role: authResult.role
+      role: authResult.role,
+      fullName: authResult.fullName || authResult.username,
+      email: authResult.email || `${authResult.username.toLowerCase()}@ordercraft.com`
     };
     if (this.isBrowser) {
       localStorage.setItem(this.TOKEN_KEY, authResult.token);

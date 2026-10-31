@@ -105,7 +105,7 @@
 
   /* Component Dimensions */
   --control-height: 36px;
-  --header-height: 56px;
+  --header-height: 64px;
 
   /* Motion */
   --transition-fast: 120ms ease;
@@ -652,6 +652,7 @@ textarea:focus {
    Dropdown Menus (Angular Material Menu Overlays)
    ========================================================================== */
 .oc-nav-dropdown-menu.mat-mdc-menu-panel,
+.user-profile-menu-panel.mat-mdc-menu-panel,
 .modern-user-menu.mat-mdc-menu-panel,
 .mat-mdc-menu-panel {
   background: #FFFFFF !important;
@@ -660,6 +661,134 @@ textarea:focus {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
   padding: 4px !important;
   min-width: 220px !important;
+}
+
+/* User Profile Menu Panel (Right-aligned user dropdown) */
+.user-profile-menu-panel.mat-mdc-menu-panel {
+  padding: 4px 0 !important;
+  min-width: 240px !important;
+  max-width: 280px !important;
+}
+
+.user-profile-menu-panel .user-dropdown-header {
+  padding: 10px 14px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: default;
+}
+
+.user-profile-menu-panel .user-dropdown-avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  background-color: #1F4E79;
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+.user-profile-menu-panel .user-dropdown-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.user-profile-menu-panel .user-dropdown-fullname {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: inherit;
+  line-height: 1.25;
+}
+
+.user-profile-menu-panel .user-dropdown-email {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: inherit;
+  line-height: 1.2;
+}
+
+.user-profile-menu-panel .user-dropdown-role-badge {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: #E8F0F8;
+  color: #1F4E79;
+  letter-spacing: 0.03em;
+  font-family: inherit;
+  line-height: 1.2;
+}
+
+.user-profile-menu-panel .mat-mdc-menu-item {
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--text-primary) !important;
+  font-family: inherit !important;
+  border-radius: 4px !important;
+  transition: background-color var(--transition-fast) !important;
+}
+
+.user-profile-menu-panel .mat-mdc-menu-item mat-icon {
+  color: var(--text-secondary) !important;
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin-right: 0 !important;
+}
+
+.user-profile-menu-panel .mat-mdc-menu-item:hover,
+.user-profile-menu-panel .mat-mdc-menu-item:focus {
+  background-color: var(--bg-subtle) !important;
+  color: var(--primary) !important;
+}
+
+.user-profile-menu-panel .mat-mdc-menu-item:hover mat-icon,
+.user-profile-menu-panel .mat-mdc-menu-item:focus mat-icon {
+  color: var(--primary) !important;
+}
+
+.user-profile-menu-panel .user-dropdown-signout-item {
+  color: var(--danger) !important;
+}
+
+.user-profile-menu-panel .user-dropdown-signout-item mat-icon {
+  color: var(--danger) !important;
+}
+
+.user-profile-menu-panel .user-dropdown-signout-item:hover,
+.user-profile-menu-panel .user-dropdown-signout-item:focus {
+  background-color: var(--danger-bg) !important;
+  color: var(--danger) !important;
+}
+
+.user-profile-menu-panel .user-dropdown-signout-item:hover mat-icon,
+.user-profile-menu-panel .user-dropdown-signout-item:focus mat-icon {
+  color: var(--danger) !important;
 }
 
 .oc-nav-dropdown-menu .mat-mdc-menu-item,

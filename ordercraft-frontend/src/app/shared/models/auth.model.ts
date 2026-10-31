@@ -7,11 +7,15 @@ export interface LoginResponse {
   token: string;
   username: string;
   role: string;
+  fullName?: string;
+  email?: string;
 }
 
 export interface UserSession {
   username: string;
   role: string;
+  fullName?: string;
+  email?: string;
 }
 
 export interface UserResponse {

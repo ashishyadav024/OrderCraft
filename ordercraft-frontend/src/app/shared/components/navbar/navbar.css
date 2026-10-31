@@ -18,7 +18,7 @@
   max-width: 1540px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 56px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -126,7 +126,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 56px;
+  height: 64px;
   padding: 0 12px;
   color: var(--text-secondary);
   font-size: 13px;
@@ -195,70 +195,122 @@
 }
 
 /* ==========================================================================
-   Right Section: User Profile & Role Info
+   Right Section: Single User-Menu Trigger Button
    ========================================================================== */
 .header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
   flex-shrink: 0;
+  height: 40px;
 }
 
-.role-badge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 7px;
-  border-radius: var(--radius-xs);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  background: var(--primary-subtle);
-  color: var(--primary);
-  border: 1px solid var(--primary-border);
-}
-
-.user-profile-btn {
+/* 1. Layout: a single <button> using display:flex; align-items:center; gap:10px; height:40px; padding:0 10px;
+      1px #E1E5EA border, border-radius:6px, transparent background, light hover background (#F4F6F8). */
+.user-menu-trigger {
   display: flex;
   align-items: center;
-  gap: 7px;
-  color: var(--text-primary) !important;
-  background: #FFFFFF !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-sm) !important;
-  padding: 3px 8px !important;
-  height: 34px !important;
+  gap: 10px;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #E1E5EA;
+  border-radius: 6px;
+  background-color: transparent;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  outline: none;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+  text-align: left;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.user-profile-btn:hover {
-  background: var(--bg-subtle) !important;
-  border-color: #CBD5E1 !important;
+/* 6. Set font-family: inherit; on the button and all children so the app font (Inter) is used everywhere. Reset all default button styles. */
+.user-menu-trigger,
+.user-menu-trigger *:not(mat-icon) {
+  font-family: inherit !important;
+  box-sizing: border-box;
 }
 
-.avatar-circle {
-  width: 22px;
-  height: 22px;
-  border-radius: var(--radius-xs);
-  background: var(--primary);
+.user-menu-trigger:hover {
+  background-color: #F4F6F8;
+  border-color: #CBD5E1;
+}
+
+.user-menu-trigger:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+/* 2. Avatar: a 32x32px perfect circle with the user's first initial, background primary color #1F4E79, white text, font-weight 600, 14px, centered with flex. */
+.user-avatar-circle {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  background-color: #1F4E79;
   color: #FFFFFF;
-  font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
 }
 
-.user-display-name {
-  font-size: 13px;
+/* 3. Username: sits to the right of the avatar on the same line (not below it), 14px, font-weight 500, color #1F2937, with text-overflow:ellipsis and max-width 120px. */
+.user-name-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1F2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  line-height: 1.2;
+}
+
+/* 4. Role badge: small, flat, soft tinted (background #E8F0F8, text #1F4E79, 11px, uppercase, padding 2px 8px, radius 4px), shown inside the same trigger after the username. */
+.user-role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #E8F0F8;
+  color: #1F4E79;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--text-primary);
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  line-height: 1.3;
 }
 
-.user-profile-btn .dropdown-caret {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  color: var(--text-muted);
+/* 5. Chevron: a small 16px icon at the end of the same button, not in a separate box, rotating 180° when the menu is open. */
+.user-dropdown-chevron {
+  font-family: 'Material Icons' !important;
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+  color: #6B7280;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 200ms ease;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.user-dropdown-chevron.rotated {
+  transform: rotate(180deg);
 }
 
 /* ==========================================================================
@@ -501,12 +553,21 @@
   .nav-links.desktop-nav {
     display: none !important;
   }
+}
 
-  .role-badge {
-    display: none;
+/* On screens below 768px hide the username and badge and show only the avatar */
+@media (max-width: 767px) {
+  .user-name-text,
+  .user-role-badge,
+  .user-dropdown-chevron {
+    display: none !important;
   }
 
-  .user-display-name {
-    display: none;
+  .user-menu-trigger {
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+    border-radius: 50%;
   }
 }

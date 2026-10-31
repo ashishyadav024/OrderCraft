@@ -1,0 +1,1 @@
+import{Sn as qn,Zt as io}from"./main-NBNYRPDA.js";import{c as O}from"./chunk-55x--afa.js";var f=(()=>{class t{static ɵfac=function(n){return new(n||t)};static ɵmod=io({type:t});static ɵinj=qn({imports:[O]})}return t})();export{f as t};

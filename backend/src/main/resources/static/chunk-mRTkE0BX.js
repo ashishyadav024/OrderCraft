@@ -1,1 +1,0 @@
-import{$t as io,at as Wn}from"./main-VQTBUTE2.js";import{n as B}from"./chunk-B3D8L1LG.js";var f=(()=>{class t{static ɵfac=function(n){return new(n||t)};static ɵmod=io({type:t});static ɵinj=Wn({imports:[B]})}return t})();export{f as t};

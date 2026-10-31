@@ -14,7 +14,15 @@ public class AuthDtos {
             @NotBlank(message = "Password is required") String password) {
     }
 
-    public record LoginResponse(String token, String username, String role) {
+    public record LoginResponse(
+            String token,
+            String username,
+            String role,
+            String fullName,
+            String email) {
+        public LoginResponse(String token, String username, String role) {
+            this(token, username, role, null, null);
+        }
     }
 
     public record RegisterRequest(

@@ -76,7 +76,13 @@ public class AuthController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password"));
 
         String token = tokenProvider.generateToken(user.getUsername(), user.getRole().name());
-        return new LoginResponse(token, user.getUsername(), user.getRole().name());
+        return new LoginResponse(
+                token,
+                user.getUsername(),
+                user.getRole().name(),
+                user.getFullName() != null ? user.getFullName() : user.getUsername(),
+                user.getEmail() != null ? user.getEmail() : (user.getUsername().toLowerCase() + "@ordercraft.com")
+        );
     }
 
     @PostMapping("/register")

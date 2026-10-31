@@ -1,1 +1,0 @@
-import{Cn as qn,Qt as io}from"./main-256ZZPJN.js";import{n as B}from"./chunk-BFjEDXLN.js";var f=(()=>{class t{static ɵfac=function(n){return new(n||t)};static ɵmod=io({type:t});static ɵinj=qn({imports:[B]})}return t})();export{f as t};

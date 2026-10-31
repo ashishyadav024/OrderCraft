@@ -1,1 +1,0 @@
-import{Tn as ro,qn as zn}from"./main-5SJ7DE54.js";import{n as B}from"./chunk-Cj-VwmC1.js";var f=(()=>{class t{static ɵfac=function(n){return new(n||t)};static ɵmod=ro({type:t});static ɵinj=zn({imports:[B]})}return t})();export{f as t};
